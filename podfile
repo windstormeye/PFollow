@@ -1,0 +1,7 @@
+platform :ios, '11.0'  
+target 'PFollow' do 
+
+pod 'AMap3DMap' #3D地图 SDK
+pod 'AMapLocation' # 定位SDK 
+
+end
