@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		62A516DDBB5C6106632BC865 /* libPods-PFollow.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E8886EABC65D6A99C5B97FE5 /* libPods-PFollow.a */; };
+		74888186212314FF00B8814D /* PJHomeMapCalloutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74888185212314FF00B8814D /* PJHomeMapCalloutView.swift */; };
 		74E67E142120009A007C68F7 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74E67E132120009A007C68F7 /* AppDelegate.swift */; };
 		74E67E1C2120009A007C68F7 /* PFollow.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 74E67E1A2120009A007C68F7 /* PFollow.xcdatamodeld */; };
 		74E67E1E2120009B007C68F7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 74E67E1D2120009B007C68F7 /* Assets.xcassets */; };
@@ -43,6 +44,7 @@
 
 /* Begin PBXFileReference section */
 		2FAB104A06AD7BB86EFBA6F4 /* Pods-PFollow.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PFollow.release.xcconfig"; path = "Pods/Target Support Files/Pods-PFollow/Pods-PFollow.release.xcconfig"; sourceTree = "<group>"; };
+		74888185212314FF00B8814D /* PJHomeMapCalloutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PJHomeMapCalloutView.swift; sourceTree = "<group>"; };
 		74E67E102120009A007C68F7 /* PFollow.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PFollow.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		74E67E132120009A007C68F7 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		74E67E1B2120009A007C68F7 /* PFollow.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = PFollow.xcdatamodel; sourceTree = "<group>"; };
@@ -191,6 +193,7 @@
 			isa = PBXGroup;
 			children = (
 				74E67E552120083B007C68F7 /* PJHomeMapView.swift */,
+				74888185212314FF00B8814D /* PJHomeMapCalloutView.swift */,
 			);
 			path = MapView;
 			sourceTree = "<group>";
@@ -397,6 +400,7 @@
 				74E67E5E21201F4C007C68F7 /* PJPlacesViewController.swift in Sources */,
 				74E67E45212004F3007C68F7 /* PJTools-UIView+Position.swift in Sources */,
 				74E67E4E21200583007C68F7 /* PJHomeViewController.swift in Sources */,
+				74888186212314FF00B8814D /* PJHomeMapCalloutView.swift in Sources */,
 				74E67E602120252F007C68F7 /* PJTapic.swift in Sources */,
 				74E67E142120009A007C68F7 /* AppDelegate.swift in Sources */,
 				74E67E5B2120137B007C68F7 /* PJHomeBottomView.swift in Sources */,
@@ -569,6 +573,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = U6J5965DZK;
 				INFOPLIST_FILE = PFollow/Info.plist;
@@ -579,6 +584,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.pjhubs.PFollow;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "PFollow/PFollow-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 4.0;
@@ -592,6 +598,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = U6J5965DZK;
 				INFOPLIST_FILE = PFollow/Info.plist;
@@ -602,6 +609,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.pjhubs.PFollow;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "PFollow/PFollow-Bridging-Header.h";
 				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = 1;

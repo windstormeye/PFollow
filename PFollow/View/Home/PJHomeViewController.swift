@@ -8,7 +8,7 @@
 
 import UIKit
 
-class PJHomeViewController: UIViewController, PJHomeBottomViewDelegate {
+class PJHomeViewController: UIViewController, PJHomeBottomViewDelegate, PJMapViewDelete {
 
     var mapView: PJHomeMapView?
     var bottomView: PJHomeBottomView?
@@ -20,6 +20,10 @@ class PJHomeViewController: UIViewController, PJHomeBottomViewDelegate {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+        
+        // 视图载入完成后，设置地图缩放等级
+        mapView?.mapView.setZoomLevel(15, animated: true)
+        
         if bottomView?.stackView?.alpha == 0 {
             UIView.animate(withDuration: 0.25) {
                 self.bottomView?.stackView?.alpha = 1
@@ -33,6 +37,7 @@ class PJHomeViewController: UIViewController, PJHomeBottomViewDelegate {
     
     private func initView() {
         mapView = PJHomeMapView.init(frame: CGRect(x: 0, y: 0, width: PJSCREEN_WIDTH, height: PJSCREEN_HEIGHT))
+        mapView?.viewDelegate = self
         view.addSubview(mapView!)
         
         bottomView = PJHomeBottomView.init(frame: CGRect(x: -PJSCREEN_WIDTH * 0.1, y: PJSCREEN_HEIGHT - 120, width: PJSCREEN_WIDTH * 1.2, height: 160))
@@ -63,7 +68,7 @@ class PJHomeViewController: UIViewController, PJHomeBottomViewDelegate {
                     if finished {
                         let point = self.mapView?.mapView.convert((self.mapView?.mapView.userLocation.location.coordinate)!, toPointTo: self.mapView)
                         print(point as Any)
-                        let tempTapImageView = UIImageView(image: UIImage(named: "home_tap"))
+                        let tempTapImageView = UIImageView(image: UIImage(named: "home_tap_cover"))
                         tempTapImageView.frame.size = CGSize(width: 50, height: 50)
                         tempTapImageView.centerX = view.centerX
                         tempTapImageView.bottom = (self.bottomView?.bottom)!
@@ -78,11 +83,8 @@ class PJHomeViewController: UIViewController, PJHomeBottomViewDelegate {
                                     if finished {
                                         tempTapImageView.removeFromSuperview()
                                         
-                                        
-                                        // TODE: 这有问题，加的大头针样式不对
                                         let pointAnnotation = MAPointAnnotation()
                                         pointAnnotation.coordinate = (self.mapView?.mapView.userLocation.location.coordinate)!
-                                        
                                         self.mapView?.mapView.addAnnotation(pointAnnotation)
                                     }
                                 })
@@ -94,6 +96,9 @@ class PJHomeViewController: UIViewController, PJHomeBottomViewDelegate {
         }
     }
     
+    func mapView(_ mapView: PJHomeMapView, rotateDegree: CGFloat) {
+        bottomView?.rotateDegree = rotateDegree
+    }
     
     override var preferredStatusBarStyle: UIStatusBarStyle {
         return .lightContent

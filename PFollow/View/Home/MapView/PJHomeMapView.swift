@@ -9,7 +9,7 @@
 import UIKit
 
 @objc protocol PJMapViewDelete {
-//    @objc optional func
+    @objc optional func mapView(_ mapView: PJHomeMapView, rotateDegree: CGFloat)
 }
 
 class PJHomeMapView: UIView, MAMapViewDelegate {
@@ -18,7 +18,6 @@ class PJHomeMapView: UIView, MAMapViewDelegate {
     
     private(set) var mapView: MAMapView = MAMapView()
     private var r = MAUserLocationRepresentation()
-    
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -52,6 +51,44 @@ class PJHomeMapView: UIView, MAMapViewDelegate {
     }
     
     required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        super.init(coder: aDecoder)
     }
+    
+    func mapView(_ mapView: MAMapView!, viewFor annotation: MAAnnotation!) -> MAAnnotationView! {
+        
+        // 判断如果是 `MAPointAnnotation` 类型则返回自定义大头针
+        if annotation.isKind(of: MAPointAnnotation.self) {
+            let annotationStyleReuseIndetifier = "annotationStyleReuserIdentifier"
+            
+            var annotationView: MAAnnotationView! = mapView.dequeueReusableAnnotationView(withIdentifier: annotationStyleReuseIndetifier)
+            
+            if annotationView == nil {
+                annotationView = MAAnnotationView(annotation: annotation, reuseIdentifier: annotationStyleReuseIndetifier)
+            }
+            annotationView.image = UIImage(named: "home_map_makers_01")
+            annotationView.canShowCallout = true
+            return annotationView
+        }
+        
+        return nil
+    }
+    
+    func mapView(_ mapView: MAMapView!, didUpdate userLocation: MAUserLocation!, updatingLocation: Bool) {
+        if !updatingLocation {
+            viewDelegate?.mapView!(self, rotateDegree: CGFloat(userLocation.heading.trueHeading) - mapView.rotationDegree)
+        }
+    }
+    
+    func mapView(_ mapView: MAMapView!, didSelect view: MAAnnotationView!) {
+        print("2333")
+    }
+    
+    func mapView(_ mapView: MAMapView!, didDeselect view: MAAnnotationView!) {
+        print("4666")
+    }
+    
+    func mapView(_ mapView: MAMapView!, didAnnotationViewCalloutTapped view: MAAnnotationView!) {
+        print("aaaaaaaa")
+    }
+    
 }

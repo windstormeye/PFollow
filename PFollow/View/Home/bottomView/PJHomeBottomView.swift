@@ -18,6 +18,17 @@ class PJHomeBottomView: UIView {
     var viewDelegate: PJHomeBottomViewDelegate?
     private(set) var stackView: UIStackView?
     
+    private var tapBtn = UIButton()
+    
+    var rotateDegree:CGFloat{
+        set {
+            self.tapBtn.transform = CGAffineTransform(rotationAngle: newValue * .pi / 180.0)
+        }
+        get {
+            return self.rotateDegree
+        }
+    }
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         initView()
@@ -49,7 +60,6 @@ class PJHomeBottomView: UIView {
         placesBtn.addTarget(self, action: #selector(placesBtnClick), for: .touchUpInside)
         stackView?.addArrangedSubview(placesBtn)
         
-        let tapBtn = UIButton()
         tapBtn.layer.shadowColor = UIColor.black.cgColor
         tapBtn.layer.shadowRadius = 5
         tapBtn.layer.shadowOpacity = 0.3
