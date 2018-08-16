@@ -12,17 +12,22 @@ import UIKit
     @objc optional func mapView(_ mapView: PJHomeMapView, rotateDegree: CGFloat)
 }
 
-class PJHomeMapView: UIView, MAMapViewDelegate {
+class PJHomeMapView: UIView, MAMapViewDelegate, AMapSearchDelegate {
 
     var viewDelegate: PJMapViewDelete?
     
     private(set) var mapView: MAMapView = MAMapView()
     private var r = MAUserLocationRepresentation()
+    private let search = AMapSearchAPI()
+    private var currentCalloutView: PJHomeMapAnnotetionView?
+
     
     override init(frame: CGRect) {
         super.init(frame: frame)
         
         AMapServices.shared().enableHTTPS = true
+        
+        search?.delegate = self
         
         mapView.frame = frame
         mapView.delegate = self
@@ -37,7 +42,6 @@ class PJHomeMapView: UIView, MAMapViewDelegate {
         // 用户模式跟踪
         mapView.userTrackingMode = .follow
         
-        // TODO: 这块有问题，没法进行用户方向的确定
         r.showsHeadingIndicator = true
         r.showsAccuracyRing = true
         mapView.update(r)
@@ -56,17 +60,23 @@ class PJHomeMapView: UIView, MAMapViewDelegate {
     
     func mapView(_ mapView: MAMapView!, viewFor annotation: MAAnnotation!) -> MAAnnotationView! {
         
+        if annotation.isKind(of: MAUserLocation.self) {
+            return nil
+        }
+        
         // 判断如果是 `MAPointAnnotation` 类型则返回自定义大头针
         if annotation.isKind(of: MAPointAnnotation.self) {
             let annotationStyleReuseIndetifier = "annotationStyleReuserIdentifier"
             
-            var annotationView: MAAnnotationView! = mapView.dequeueReusableAnnotationView(withIdentifier: annotationStyleReuseIndetifier)
+            var annotationView = mapView.dequeueReusableAnnotationView(withIdentifier: annotationStyleReuseIndetifier) as! PJHomeMapAnnotetionView?
             
             if annotationView == nil {
-                annotationView = MAAnnotationView(annotation: annotation, reuseIdentifier: annotationStyleReuseIndetifier)
+                annotationView = PJHomeMapAnnotetionView(annotation: annotation, reuseIdentifier: annotationStyleReuseIndetifier)
             }
-            annotationView.image = UIImage(named: "home_map_makers_01")
-            annotationView.canShowCallout = true
+            annotationView?.image = UIImage(named: "home_map_makers_01")
+            annotationView?.canShowCallout = false
+            annotationView?.tag = mapView.annotations.count + 1
+            currentCalloutView = annotationView
             return annotationView
         }
         
@@ -80,7 +90,15 @@ class PJHomeMapView: UIView, MAMapViewDelegate {
     }
     
     func mapView(_ mapView: MAMapView!, didSelect view: MAAnnotationView!) {
-        print("2333")
+        // 这还是有问题
+        if view.tag == 0 {
+            return
+        }
+        let request = AMapReGeocodeSearchRequest()
+        let coordinate = view.annotation.coordinate
+        request.location = AMapGeoPoint.location(withLatitude: CGFloat(coordinate.latitude), longitude: CGFloat(coordinate.longitude))
+        request.requireExtension = true
+        search?.aMapReGoecodeSearch(request)
     }
     
     func mapView(_ mapView: MAMapView!, didDeselect view: MAAnnotationView!) {
@@ -89,6 +107,16 @@ class PJHomeMapView: UIView, MAMapViewDelegate {
     
     func mapView(_ mapView: MAMapView!, didAnnotationViewCalloutTapped view: MAAnnotationView!) {
         print("aaaaaaaa")
+    }
+    
+    func onReGeocodeSearchDone(_ request: AMapReGeocodeSearchRequest!, response: AMapReGeocodeSearchResponse!) {
+        if response.regeocode != nil {
+            currentCalloutView?.title = response.regeocode.formattedAddress as String
+        }
+    }
+    
+    func aMapSearchRequest(_ request: Any!, didFailWithError error: Error!) {
+        print("Error:\(error)")
     }
     
 }

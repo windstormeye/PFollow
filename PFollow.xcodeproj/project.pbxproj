@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		62A516DDBB5C6106632BC865 /* libPods-PFollow.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E8886EABC65D6A99C5B97FE5 /* libPods-PFollow.a */; };
 		74888186212314FF00B8814D /* PJHomeMapCalloutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74888185212314FF00B8814D /* PJHomeMapCalloutView.swift */; };
+		748881882125B6D800B8814D /* PJHomeMapAnnotetionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 748881872125B6D800B8814D /* PJHomeMapAnnotetionView.swift */; };
 		74E67E142120009A007C68F7 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74E67E132120009A007C68F7 /* AppDelegate.swift */; };
 		74E67E1C2120009A007C68F7 /* PFollow.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 74E67E1A2120009A007C68F7 /* PFollow.xcdatamodeld */; };
 		74E67E1E2120009B007C68F7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 74E67E1D2120009B007C68F7 /* Assets.xcassets */; };
@@ -45,6 +46,7 @@
 /* Begin PBXFileReference section */
 		2FAB104A06AD7BB86EFBA6F4 /* Pods-PFollow.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PFollow.release.xcconfig"; path = "Pods/Target Support Files/Pods-PFollow/Pods-PFollow.release.xcconfig"; sourceTree = "<group>"; };
 		74888185212314FF00B8814D /* PJHomeMapCalloutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PJHomeMapCalloutView.swift; sourceTree = "<group>"; };
+		748881872125B6D800B8814D /* PJHomeMapAnnotetionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PJHomeMapAnnotetionView.swift; sourceTree = "<group>"; };
 		74E67E102120009A007C68F7 /* PFollow.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PFollow.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		74E67E132120009A007C68F7 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		74E67E1B2120009A007C68F7 /* PFollow.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = PFollow.xcdatamodel; sourceTree = "<group>"; };
@@ -194,6 +196,7 @@
 			children = (
 				74E67E552120083B007C68F7 /* PJHomeMapView.swift */,
 				74888185212314FF00B8814D /* PJHomeMapCalloutView.swift */,
+				748881872125B6D800B8814D /* PJHomeMapAnnotetionView.swift */,
 			);
 			path = MapView;
 			sourceTree = "<group>";
@@ -407,6 +410,7 @@
 				74E67E1C2120009A007C68F7 /* PFollow.xcdatamodeld in Sources */,
 				74E67E562120083B007C68F7 /* PJHomeMapView.swift in Sources */,
 				74E67E4A21200539007C68F7 /* PJDefine.swift in Sources */,
+				748881882125B6D800B8814D /* PJHomeMapAnnotetionView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

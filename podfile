@@ -3,5 +3,6 @@ target 'PFollow' do
 
 pod 'AMap3DMap' #3D地图 SDK
 pod 'AMapLocation' # 定位SDK 
+pod 'AMapSearch' # 搜索功能 SDK
 
 end
