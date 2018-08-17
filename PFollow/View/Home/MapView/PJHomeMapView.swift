@@ -12,15 +12,14 @@ import UIKit
     @objc optional func mapView(_ mapView: PJHomeMapView, rotateDegree: CGFloat)
 }
 
-class PJHomeMapView: UIView, MAMapViewDelegate, AMapSearchDelegate {
+class PJHomeMapView: UIView, MAMapViewDelegate, AMapSearchDelegate, PJHomeMapAnnotationViewDelegate {
 
     var viewDelegate: PJMapViewDelete?
-    
     private(set) var mapView: MAMapView = MAMapView()
     private var r = MAUserLocationRepresentation()
     private let search = AMapSearchAPI()
-    private var currentCalloutView: PJHomeMapAnnotetionView?
-
+    private let req = AMapWeatherSearchRequest()
+    private var currentCalloutView: PJHomeMapAnnotationView?
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -28,6 +27,7 @@ class PJHomeMapView: UIView, MAMapViewDelegate, AMapSearchDelegate {
         AMapServices.shared().enableHTTPS = true
         
         search?.delegate = self
+        req.type = AMapWeatherType.live
         
         mapView.frame = frame
         mapView.delegate = self
@@ -42,8 +42,8 @@ class PJHomeMapView: UIView, MAMapViewDelegate, AMapSearchDelegate {
         // 用户模式跟踪
         mapView.userTrackingMode = .follow
         
-        r.showsHeadingIndicator = true
-        r.showsAccuracyRing = true
+        r.image = UIImage(named: "home_map_userlocation")
+        r.showsAccuracyRing = false
         mapView.update(r)
         
         var path = Bundle.main.bundlePath
@@ -54,12 +54,24 @@ class PJHomeMapView: UIView, MAMapViewDelegate, AMapSearchDelegate {
         addSubview(mapView)
     }
     
+    
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
     }
     
+    
+    // tag == 0 为用户位置蓝点，在添加上 mapView 之前先判断然后不允许进行交互
+    func mapView(_ mapView: MAMapView!, didAddAnnotationViews views: [Any]!) {
+        for view in views {
+            let v = view as! MAAnnotationView
+            if v.tag == 0 {
+                v.isUserInteractionEnabled = false
+            }
+        }
+    }
+    
+    
     func mapView(_ mapView: MAMapView!, viewFor annotation: MAAnnotation!) -> MAAnnotationView! {
-        
         if annotation.isKind(of: MAUserLocation.self) {
             return nil
         }
@@ -68,20 +80,69 @@ class PJHomeMapView: UIView, MAMapViewDelegate, AMapSearchDelegate {
         if annotation.isKind(of: MAPointAnnotation.self) {
             let annotationStyleReuseIndetifier = "annotationStyleReuserIdentifier"
             
-            var annotationView = mapView.dequeueReusableAnnotationView(withIdentifier: annotationStyleReuseIndetifier) as! PJHomeMapAnnotetionView?
+            var annotationView = mapView.dequeueReusableAnnotationView(withIdentifier: annotationStyleReuseIndetifier) as! PJHomeMapAnnotationView?
             
             if annotationView == nil {
-                annotationView = PJHomeMapAnnotetionView(annotation: annotation, reuseIdentifier: annotationStyleReuseIndetifier)
+                annotationView = PJHomeMapAnnotationView(annotation: annotation, reuseIdentifier: annotationStyleReuseIndetifier)
             }
-            annotationView?.image = UIImage(named: "home_map_makers_01")
+            annotationView?.image = UIImage(named: "home_map_makers_01_b")
             annotationView?.canShowCallout = false
+            annotationView?.viewDelegate = self
             annotationView?.tag = mapView.annotations.count + 1
             currentCalloutView = annotationView
+            
+            let request = AMapReGeocodeSearchRequest()
+            request.location = AMapGeoPoint.location(withLatitude: CGFloat(annotation.coordinate.latitude), longitude: CGFloat(annotation.coordinate.longitude))
+            request.requireExtension = true
+            search?.aMapReGoecodeSearch(request)
+            
+            // TODO: 最佳做法根据用户当前位置进行判断
+            req.city = "杭州"
+            search?.aMapWeatherSearch(req)
+            
             return annotationView
         }
         
         return nil
     }
+    
+    
+    // MARK:delegate
+    
+    
+    func homeMapAnnotationView(annotationView: PJHomeMapAnnotationView, shareAnnotaion: MAAnnotation) {
+        
+    }
+    
+    
+    func homeMapAnnotationView(annotationView: PJHomeMapAnnotationView, removeAnnotaion: MAAnnotation) {
+        UIView.animate(withDuration: 0.2, animations: {
+            annotationView.y -= 15
+        }) { (finished) in
+            if finished {
+                UIView.animate(withDuration: 0.2, animations: {
+                    annotationView.y += 20
+                }, completion: { (finished) in
+                    if finished {
+                        UIView.animate(withDuration: 0.25, animations: {
+                            annotationView.y -= 5
+                        }, completion: { (finished) in
+                            if finished {
+                                UIView.animate(withDuration: 0.25, animations: {
+                                    annotationView.alpha = 0
+                                }, completion: { (finished) in
+                                    if finished {
+                                        self.mapView.removeAnnotation(removeAnnotaion)
+                                    }
+                                })
+                            }
+                        })
+                    }
+                })
+            }
+        }
+    }
+    
     
     func mapView(_ mapView: MAMapView!, didUpdate userLocation: MAUserLocation!, updatingLocation: Bool) {
         if !updatingLocation {
@@ -89,31 +150,36 @@ class PJHomeMapView: UIView, MAMapViewDelegate, AMapSearchDelegate {
         }
     }
     
+    
     func mapView(_ mapView: MAMapView!, didSelect view: MAAnnotationView!) {
-        // 这还是有问题
-        if view.tag == 0 {
-            return
-        }
-        let request = AMapReGeocodeSearchRequest()
-        let coordinate = view.annotation.coordinate
-        request.location = AMapGeoPoint.location(withLatitude: CGFloat(coordinate.latitude), longitude: CGFloat(coordinate.longitude))
-        request.requireExtension = true
-        search?.aMapReGoecodeSearch(request)
+        currentCalloutView?.title = "2020-12-29    来过"
     }
+    
     
     func mapView(_ mapView: MAMapView!, didDeselect view: MAAnnotationView!) {
         print("4666")
     }
     
+    
     func mapView(_ mapView: MAMapView!, didAnnotationViewCalloutTapped view: MAAnnotationView!) {
         print("aaaaaaaa")
     }
     
+    
     func onReGeocodeSearchDone(_ request: AMapReGeocodeSearchRequest!, response: AMapReGeocodeSearchResponse!) {
         if response.regeocode != nil {
-            currentCalloutView?.title = response.regeocode.formattedAddress as String
+            
         }
     }
+    
+    
+    func onWeatherSearchDone(_ request: AMapWeatherSearchRequest!, response: AMapWeatherSearchResponse!) {
+        // 天气现象
+        currentCalloutView?.imageName = response.lives[0].weather
+        // 实时温度
+        currentCalloutView?.temperature = response.lives[0].temperature
+    }
+    
     
     func aMapSearchRequest(_ request: Any!, didFailWithError error: Error!) {
         print("Error:\(error)")

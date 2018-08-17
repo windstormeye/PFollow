@@ -195,8 +195,8 @@
 			isa = PBXGroup;
 			children = (
 				74E67E552120083B007C68F7 /* PJHomeMapView.swift */,
-				74888185212314FF00B8814D /* PJHomeMapCalloutView.swift */,
 				748881872125B6D800B8814D /* PJHomeMapAnnotetionView.swift */,
+				74888185212314FF00B8814D /* PJHomeMapCalloutView.swift */,
 			);
 			path = MapView;
 			sourceTree = "<group>";

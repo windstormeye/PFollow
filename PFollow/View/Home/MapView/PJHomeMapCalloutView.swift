@@ -8,36 +8,63 @@
 
 import UIKit
 
+@objc protocol PJHomeMapCalloutViewDelegate {
+    @objc optional func homeMapCalloutRemoveAnnotation(callout: PJHomeMapCalloutView)
+    @objc optional func homeMapCalloutShareAnnotation(callout: PJHomeMapCalloutView)
+}
+
 class PJHomeMapCalloutView: UIView {
 
-    // 地理位置
     var title: String {
         willSet(t) {
             willSetTitle(t)
         }
     }
     
-    private var likeBtn = UIButton()
-    private var commentBtn = UIButton()
-    private var shareBtn = UIButton()
-    private var deleteBtn = UIButton()
-    private var titleLabel = UILabel()
+    var imageName: String {
+        willSet(i) {
+            willSetImageName(i)
+        }
+    }
     
+    var temperature: String {
+        willSet(t) {
+            willSetTemperature(t)
+        }
+    }
+    
+    var viewDelegate: PJHomeMapCalloutViewDelegate?
+    
+    private(set) var shareBtn = UIButton()
+    private(set) var deleteBtn = UIButton()
+    private var titleLabel = UILabel()
+    private var temperatureLabel = UILabel()
+    private var weatherImageView = UIImageView()
     private let kArrorHeight = CGFloat(10)
     
     override init(frame: CGRect) {
         title = ""
+        imageName = ""
+        temperature = ""
         super.init(frame: frame)
         self.backgroundColor = .clear
+        self.isUserInteractionEnabled = true
         
-        titleLabel.text = title
+        weatherImageView.frame = CGRect(x: 0, y: 0, width: 20, height: 20)
+        addSubview(weatherImageView)
+        
+        temperatureLabel.textColor = .black
+        temperatureLabel.font = UIFont.systemFont(ofSize: 12, weight: .thin)
+        temperatureLabel.frame = CGRect(x: 22, y: weatherImageView.y, width: 30, height: 20)
+        addSubview(temperatureLabel)
+        
         titleLabel.textColor = .black
         titleLabel.textAlignment = .center
-        titleLabel.font = UIFont.boldSystemFont(ofSize: 15)
-        titleLabel.frame = CGRect(x: 0, y: 10, width: self.width, height: 20)
+        titleLabel.font = UIFont.systemFont(ofSize: 16, weight: .regular)
+        titleLabel.frame = CGRect(x: 5, y: temperatureLabel.bottom + 10, width: self.width - 10, height: 20)
         addSubview(titleLabel)
         
-        let stackView = UIStackView(frame: CGRect(x: 0, y: 35, width: self.width, height: self.height - 45))
+        let stackView = UIStackView(frame: CGRect(x: 0, y: self.bottom - 45, width: self.width, height: 30))
         stackView.alignment = .fill
         stackView.axis = .horizontal
         stackView.spacing = 10
@@ -55,16 +82,19 @@ class PJHomeMapCalloutView: UIView {
     
     required init?(coder aDecoder: NSCoder) {
         title = ""
+        imageName = ""
+        temperature = ""
         super.init(coder: aDecoder)
     }
     
+    
     // MARK: Action
     @objc private func deleteBtnAction() {
-        print("delelte")
+        viewDelegate?.homeMapCalloutRemoveAnnotation!(callout: self)
     }
     
     @objc private func shareBtnAction() {
-        print("share")
+        viewDelegate?.homeMapCalloutShareAnnotation!(callout: self)
     }
     
     override func draw(_ rect: CGRect) {
@@ -101,9 +131,20 @@ class PJHomeMapCalloutView: UIView {
         context?.closePath()
     }
     
+    
     // MARK: setter and getter
     private func willSetTitle(_ title: String) {
         titleLabel.text = title
+    }
+    
+    
+    private func willSetImageName(_ imageName: String) {
+        weatherImageView.image = UIImage(named: imageName)
+    }
+    
+    
+    private func willSetTemperature(_ temperature: String) {
+        temperatureLabel.text = temperature + "°"
     }
     
 }
