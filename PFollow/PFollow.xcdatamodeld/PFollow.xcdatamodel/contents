@@ -1,4 +1,28 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="1" systemVersion="11A491" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
-    <elements/>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="14135" systemVersion="17E199" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="Annotation" representedClassName="Annotation" syncable="YES" codeGenerationType="class">
+        <attribute name="created_time" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="environment" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="latitude" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="longitude" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="weather" optional="YES" attributeType="String" syncable="YES"/>
+        <relationship name="annotationToOneCity" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="AnnotationCity" inverseName="cityToManyAnnotation" inverseEntity="AnnotationCity" syncable="YES"/>
+        <relationship name="annotationToOneImage" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="AnnotationImage" inverseName="imageToOneAnnotation" inverseEntity="AnnotationImage" syncable="YES"/>
+    </entity>
+    <entity name="AnnotationCity" representedClassName="AnnotationCity" syncable="YES" codeGenerationType="class">
+        <attribute name="city" optional="YES" attributeType="String" syncable="YES"/>
+        <relationship name="cityToManyAnnotation" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Annotation" inverseName="annotationToOneCity" inverseEntity="Annotation" syncable="YES"/>
+    </entity>
+    <entity name="AnnotationContent" representedClassName="AnnotationContent" syncable="YES" codeGenerationType="class"/>
+    <entity name="AnnotationImage" representedClassName="AnnotationImage" syncable="YES" codeGenerationType="class">
+        <attribute name="imageName" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="isCache" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <relationship name="imageToOneAnnotation" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Annotation" inverseName="annotationToOneImage" inverseEntity="Annotation" syncable="YES"/>
+    </entity>
+    <elements>
+        <element name="Annotation" positionX="-63" positionY="-18" width="128" height="150"/>
+        <element name="AnnotationCity" positionX="-54" positionY="27" width="128" height="75"/>
+        <element name="AnnotationImage" positionX="-54" positionY="36" width="128" height="90"/>
+        <element name="AnnotationContent" positionX="-45" positionY="54" width="128" height="45"/>
+    </elements>
 </model>

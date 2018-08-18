@@ -10,6 +10,9 @@
 		62A516DDBB5C6106632BC865 /* libPods-PFollow.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E8886EABC65D6A99C5B97FE5 /* libPods-PFollow.a */; };
 		74888186212314FF00B8814D /* PJHomeMapCalloutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74888185212314FF00B8814D /* PJHomeMapCalloutView.swift */; };
 		748881882125B6D800B8814D /* PJHomeMapAnnotetionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 748881872125B6D800B8814D /* PJHomeMapAnnotetionView.swift */; };
+		74D07130212811A1007A04A7 /* PJInfoFlowViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74D0712F212811A1007A04A7 /* PJInfoFlowViewController.swift */; };
+		74D0713221284DC7007A04A7 /* PJCoreDataHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74D0713121284DC7007A04A7 /* PJCoreDataHelper.swift */; };
+		74D0713521285652007A04A7 /* AnnotationModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74D0713421285652007A04A7 /* AnnotationModel.swift */; };
 		74E67E142120009A007C68F7 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74E67E132120009A007C68F7 /* AppDelegate.swift */; };
 		74E67E1C2120009A007C68F7 /* PFollow.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 74E67E1A2120009A007C68F7 /* PFollow.xcdatamodeld */; };
 		74E67E1E2120009B007C68F7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 74E67E1D2120009B007C68F7 /* Assets.xcassets */; };
@@ -47,6 +50,9 @@
 		2FAB104A06AD7BB86EFBA6F4 /* Pods-PFollow.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PFollow.release.xcconfig"; path = "Pods/Target Support Files/Pods-PFollow/Pods-PFollow.release.xcconfig"; sourceTree = "<group>"; };
 		74888185212314FF00B8814D /* PJHomeMapCalloutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PJHomeMapCalloutView.swift; sourceTree = "<group>"; };
 		748881872125B6D800B8814D /* PJHomeMapAnnotetionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PJHomeMapAnnotetionView.swift; sourceTree = "<group>"; };
+		74D0712F212811A1007A04A7 /* PJInfoFlowViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PJInfoFlowViewController.swift; sourceTree = "<group>"; };
+		74D0713121284DC7007A04A7 /* PJCoreDataHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PJCoreDataHelper.swift; sourceTree = "<group>"; };
+		74D0713421285652007A04A7 /* AnnotationModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnnotationModel.swift; sourceTree = "<group>"; };
 		74E67E102120009A007C68F7 /* PFollow.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PFollow.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		74E67E132120009A007C68F7 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		74E67E1B2120009A007C68F7 /* PFollow.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = PFollow.xcdatamodel; sourceTree = "<group>"; };
@@ -106,6 +112,22 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		74D0712E21281171007A04A7 /* InfoFlow */ = {
+			isa = PBXGroup;
+			children = (
+				74D0712F212811A1007A04A7 /* PJInfoFlowViewController.swift */,
+			);
+			path = InfoFlow;
+			sourceTree = "<group>";
+		};
+		74D07133212852E8007A04A7 /* model */ = {
+			isa = PBXGroup;
+			children = (
+				74D0713421285652007A04A7 /* AnnotationModel.swift */,
+			);
+			path = model;
+			sourceTree = "<group>";
+		};
 		74E67E0721200099007C68F7 = {
 			isa = PBXGroup;
 			children = (
@@ -132,8 +154,8 @@
 			isa = PBXGroup;
 			children = (
 				74E67E132120009A007C68F7 /* AppDelegate.swift */,
-				74E67E46212004F6007C68F7 /* common */,
-				74E67E4B21200557007C68F7 /* View */,
+				74E67E46212004F6007C68F7 /* Common */,
+				74E67E4B21200557007C68F7 /* Page */,
 				74E67E1D2120009B007C68F7 /* Assets.xcassets */,
 				74E67E1F2120009B007C68F7 /* LaunchScreen.storyboard */,
 				74E67E222120009B007C68F7 /* Info.plist */,
@@ -162,23 +184,25 @@
 			path = PFollowUITests;
 			sourceTree = "<group>";
 		};
-		74E67E46212004F6007C68F7 /* common */ = {
+		74E67E46212004F6007C68F7 /* Common */ = {
 			isa = PBXGroup;
 			children = (
 				74E67E5F2120252F007C68F7 /* PJTapic.swift */,
 				74E67E4921200539007C68F7 /* PJDefine.swift */,
 				74E67E44212004F3007C68F7 /* PJTools-UIView+Position.swift */,
+				74D0713121284DC7007A04A7 /* PJCoreDataHelper.swift */,
 			);
-			path = common;
+			path = Common;
 			sourceTree = "<group>";
 		};
-		74E67E4B21200557007C68F7 /* View */ = {
+		74E67E4B21200557007C68F7 /* Page */ = {
 			isa = PBXGroup;
 			children = (
+				74D0712E21281171007A04A7 /* InfoFlow */,
 				74E67E5C21201F2E007C68F7 /* Places */,
 				74E67E4C21200563007C68F7 /* Home */,
 			);
-			path = View;
+			path = Page;
 			sourceTree = "<group>";
 		};
 		74E67E4C21200563007C68F7 /* Home */ = {
@@ -194,6 +218,7 @@
 		74E67E542120082D007C68F7 /* MapView */ = {
 			isa = PBXGroup;
 			children = (
+				74D07133212852E8007A04A7 /* model */,
 				74E67E552120083B007C68F7 /* PJHomeMapView.swift */,
 				748881872125B6D800B8814D /* PJHomeMapAnnotetionView.swift */,
 				74888185212314FF00B8814D /* PJHomeMapCalloutView.swift */,
@@ -406,11 +431,14 @@
 				74888186212314FF00B8814D /* PJHomeMapCalloutView.swift in Sources */,
 				74E67E602120252F007C68F7 /* PJTapic.swift in Sources */,
 				74E67E142120009A007C68F7 /* AppDelegate.swift in Sources */,
+				74D07130212811A1007A04A7 /* PJInfoFlowViewController.swift in Sources */,
 				74E67E5B2120137B007C68F7 /* PJHomeBottomView.swift in Sources */,
 				74E67E1C2120009A007C68F7 /* PFollow.xcdatamodeld in Sources */,
 				74E67E562120083B007C68F7 /* PJHomeMapView.swift in Sources */,
 				74E67E4A21200539007C68F7 /* PJDefine.swift in Sources */,
 				748881882125B6D800B8814D /* PJHomeMapAnnotetionView.swift in Sources */,
+				74D0713521285652007A04A7 /* AnnotationModel.swift in Sources */,
+				74D0713221284DC7007A04A7 /* PJCoreDataHelper.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -579,6 +607,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
+				DEPLOYMENT_POSTPROCESSING = NO;
 				DEVELOPMENT_TEAM = U6J5965DZK;
 				INFOPLIST_FILE = PFollow/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;

@@ -15,11 +15,18 @@ import UIKit
 class PJHomeMapView: UIView, MAMapViewDelegate, AMapSearchDelegate, PJHomeMapAnnotationViewDelegate {
 
     var viewDelegate: PJMapViewDelete?
+    var models = [AnnotationModel]()
+    var isCache: Bool = false
+    
     private(set) var mapView: MAMapView = MAMapView()
+    
+    private var currentCacheAnnotationIndex = 0
     private var r = MAUserLocationRepresentation()
     private let search = AMapSearchAPI()
     private let req = AMapWeatherSearchRequest()
     private var currentCalloutView: PJHomeMapAnnotationView?
+    private var currentAnnotationModel: AnnotationModel?
+    private var currentrAnnotation: MAAnnotation?
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -89,16 +96,19 @@ class PJHomeMapView: UIView, MAMapViewDelegate, AMapSearchDelegate, PJHomeMapAnn
             annotationView?.canShowCallout = false
             annotationView?.viewDelegate = self
             annotationView?.tag = mapView.annotations.count + 1
+            
             currentCalloutView = annotationView
+            currentrAnnotation = annotation
+            
+            if isCache {
+                annotationView?.model = models[currentCacheAnnotationIndex]
+                return annotationView
+            }
             
             let request = AMapReGeocodeSearchRequest()
             request.location = AMapGeoPoint.location(withLatitude: CGFloat(annotation.coordinate.latitude), longitude: CGFloat(annotation.coordinate.longitude))
             request.requireExtension = true
             search?.aMapReGoecodeSearch(request)
-            
-            // TODO: 最佳做法根据用户当前位置进行判断
-            req.city = "杭州"
-            search?.aMapWeatherSearch(req)
             
             return annotationView
         }
@@ -108,8 +118,6 @@ class PJHomeMapView: UIView, MAMapViewDelegate, AMapSearchDelegate, PJHomeMapAnn
     
     
     // MARK:delegate
-    
-    
     func homeMapAnnotationView(annotationView: PJHomeMapAnnotationView, shareAnnotaion: MAAnnotation) {
         
     }
@@ -144,6 +152,11 @@ class PJHomeMapView: UIView, MAMapViewDelegate, AMapSearchDelegate, PJHomeMapAnn
     }
     
     
+    func homeMapAnnotationViewTappedView(annotationView: PJHomeMapCalloutView) {
+        print("2332134")
+    }
+    
+    
     func mapView(_ mapView: MAMapView!, didUpdate userLocation: MAUserLocation!, updatingLocation: Bool) {
         if !updatingLocation {
             viewDelegate?.mapView!(self, rotateDegree: CGFloat(userLocation.heading.trueHeading) - mapView.rotationDegree)
@@ -151,33 +164,38 @@ class PJHomeMapView: UIView, MAMapViewDelegate, AMapSearchDelegate, PJHomeMapAnn
     }
     
     
-    func mapView(_ mapView: MAMapView!, didSelect view: MAAnnotationView!) {
-        currentCalloutView?.title = "2020-12-29    来过"
-    }
-    
-    
-    func mapView(_ mapView: MAMapView!, didDeselect view: MAAnnotationView!) {
-        print("4666")
-    }
-    
-    
-    func mapView(_ mapView: MAMapView!, didAnnotationViewCalloutTapped view: MAAnnotationView!) {
-        print("aaaaaaaa")
-    }
-    
-    
     func onReGeocodeSearchDone(_ request: AMapReGeocodeSearchRequest!, response: AMapReGeocodeSearchResponse!) {
         if response.regeocode != nil {
+            req.city = response.regeocode.addressComponent.city
+            search?.aMapWeatherSearch(req)
             
+            print(response.regeocode.addressComponent.city)
+            print(response.regeocode.addressComponent.citycode)
         }
     }
     
     
     func onWeatherSearchDone(_ request: AMapWeatherSearchRequest!, response: AMapWeatherSearchResponse!) {
-        // 天气现象
-        currentCalloutView?.imageName = response.lives[0].weather
-        // 实时温度
-        currentCalloutView?.temperature = response.lives[0].temperature
+        let environmentString = response.lives[0].temperature + "° " + response.lives[0].windDirection + "风" + response.lives[0].windPower + "级 " + response.lives[0].humidity + "%rh"
+        
+        let timeFormatter = DateFormatter()
+        timeFormatter.dateFormat = "yyyy-MM-dd"
+        
+        let data = [
+            "createdTimeString": timeFormatter.string(from: Date()) as String,
+            "weatherString": response.lives[0].weather,
+            "environmentString": environmentString,
+            "latitude": String(Double((currentrAnnotation?.coordinate.latitude)!)),
+            "longitude": String(Double((currentrAnnotation?.coordinate.longitude)!)),
+            ]
+        
+        if let json = try? JSONSerialization.data(withJSONObject: data, options: []) {
+            if let annotationModel = try? JSONDecoder().decode(AnnotationModel.self, from: json) {
+                currentCalloutView?.model = annotationModel
+                PJCoreDataHelper.shared.addAnnotation(model: annotationModel)
+            }
+        }
+        
     }
     
     

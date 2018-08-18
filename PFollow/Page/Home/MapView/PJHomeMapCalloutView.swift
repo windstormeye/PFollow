@@ -11,49 +11,37 @@ import UIKit
 @objc protocol PJHomeMapCalloutViewDelegate {
     @objc optional func homeMapCalloutRemoveAnnotation(callout: PJHomeMapCalloutView)
     @objc optional func homeMapCalloutShareAnnotation(callout: PJHomeMapCalloutView)
+    @objc optional func homeMapCalloutTapped(callout: PJHomeMapCalloutView)
 }
 
 class PJHomeMapCalloutView: UIView {
-
-    var title: String {
-        willSet(t) {
-            willSetTitle(t)
-        }
-    }
-    
-    var imageName: String {
-        willSet(i) {
-            willSetImageName(i)
-        }
-    }
-    
-    var temperature: String {
-        willSet(t) {
-            willSetTemperature(t)
-        }
-    }
     
     var viewDelegate: PJHomeMapCalloutViewDelegate?
+    var model: AnnotationModel? {
+        willSet(model) {
+            willSetModel(model!)
+        }
+    }
     
-    private(set) var shareBtn = UIButton()
-    private(set) var deleteBtn = UIButton()
-    private var titleLabel = UILabel()
-    private var temperatureLabel = UILabel()
-    private var weatherImageView = UIImageView()
-    private let kArrorHeight = CGFloat(10)
+    private(set) var shareBtn       = UIButton()
+    private(set) var deleteBtn      = UIButton()
+    private var weatherImageView    = UIImageView()
+    private var titleLabel          = UILabel()
+    private var temperatureLabel    = UILabel()
+    private let kArrorHeight        = CGFloat(10)
     
     override init(frame: CGRect) {
-        title = ""
-        imageName = ""
-        temperature = ""
         super.init(frame: frame)
         self.backgroundColor = .clear
         self.isUserInteractionEnabled = true
+        let tapped = UITapGestureRecognizer.init(target: self, action: #selector(calloutViewTapped))
+        self.addGestureRecognizer(tapped)
         
         weatherImageView.frame = CGRect(x: 0, y: 0, width: 20, height: 20)
         addSubview(weatherImageView)
         
         temperatureLabel.textColor = .black
+        temperatureLabel.textAlignment = .left
         temperatureLabel.font = UIFont.systemFont(ofSize: 12, weight: .thin)
         temperatureLabel.frame = CGRect(x: 22, y: weatherImageView.y, width: 30, height: 20)
         addSubview(temperatureLabel)
@@ -81,9 +69,6 @@ class PJHomeMapCalloutView: UIView {
     }
     
     required init?(coder aDecoder: NSCoder) {
-        title = ""
-        imageName = ""
-        temperature = ""
         super.init(coder: aDecoder)
     }
     
@@ -93,9 +78,16 @@ class PJHomeMapCalloutView: UIView {
         viewDelegate?.homeMapCalloutRemoveAnnotation!(callout: self)
     }
     
+    
     @objc private func shareBtnAction() {
         viewDelegate?.homeMapCalloutShareAnnotation!(callout: self)
     }
+    
+    
+    @objc private func calloutViewTapped() {
+        viewDelegate?.homeMapCalloutTapped!(callout: self)
+    }
+    
     
     override func draw(_ rect: CGRect) {
         if let aContext = UIGraphicsGetCurrentContext() {
@@ -133,18 +125,13 @@ class PJHomeMapCalloutView: UIView {
     
     
     // MARK: setter and getter
-    private func willSetTitle(_ title: String) {
-        titleLabel.text = title
-    }
-    
-    
-    private func willSetImageName(_ imageName: String) {
-        weatherImageView.image = UIImage(named: imageName)
-    }
-    
-    
-    private func willSetTemperature(_ temperature: String) {
-        temperatureLabel.text = temperature + "°"
+    private func willSetModel(_ model: AnnotationModel) {
+        titleLabel.text = model.createdTimeString + " 来过"
+        weatherImageView.image = UIImage(named: model.weatherString)
+        temperatureLabel.text = model.environmentString
+        temperatureLabel.sizeToFit()
+        temperatureLabel.left = weatherImageView.right + 2
+        temperatureLabel.centerY = weatherImageView.centerY + 2
     }
     
 }

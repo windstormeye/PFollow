@@ -11,47 +11,26 @@ import UIKit
 @objc protocol PJHomeMapAnnotationViewDelegate {
     @objc optional func homeMapAnnotationView(annotationView: PJHomeMapAnnotationView, removeAnnotaion: MAAnnotation)
     @objc optional func homeMapAnnotationView(annotationView: PJHomeMapAnnotationView, shareAnnotaion: MAAnnotation)
+    @objc optional func homeMapAnnotationViewTappedView(annotationView: PJHomeMapCalloutView)
 }
 
 class PJHomeMapAnnotationView: MAAnnotationView, PJHomeMapCalloutViewDelegate {
-
-    var title: String {
-        willSet(t) {
-            willSetTitle(t)
-        }
-    }
-    
-    var imageName: String {
-        willSet(i) {
-            willSetImageName(i)
-        }
-    }
-    
-    var temperature: String {
-        willSet(t) {
-            willSetTemperature(t)
-        }
-    }
     
     var viewDelegate: PJHomeMapAnnotationViewDelegate?
+    var model: AnnotationModel?
     
     private var calloutView: PJHomeMapCalloutView?
     private var kCalloutWidth = 180.0
     private var kCalloutHeight = 100.0
     
     
-    required init?(coder aDecoder: NSCoder) {
-        title = ""
-        imageName = ""
-        temperature = ""
-        super.init(coder: aDecoder)
+    override init!(annotation: MAAnnotation!, reuseIdentifier: String!) {
+        super.init(annotation: annotation, reuseIdentifier: reuseIdentifier)
     }
     
-    override init!(annotation: MAAnnotation!, reuseIdentifier: String!) {
-        title = ""
-        imageName = ""
-        temperature = ""
-        super.init(annotation: annotation, reuseIdentifier: reuseIdentifier)
+    required init?(coder aDecoder: NSCoder) {
+        model = nil
+        super.init(coder: aDecoder)
     }
     
     override func setSelected(_ selected: Bool, animated: Bool) {
@@ -67,9 +46,7 @@ class PJHomeMapAnnotationView: MAAnnotationView, PJHomeMapCalloutViewDelegate {
             calloutView?.viewDelegate = self
             calloutView?.y += 20
             calloutView?.alpha = 0
-            calloutView?.title = title
-            calloutView?.imageName = imageName
-            calloutView?.temperature = temperature
+            calloutView?.model = model
             
             UIView.animateKeyframes(withDuration: 0.15, delay: 0, options: .calculationModeCubic, animations: {
                 self.calloutView?.alpha = 1.0
@@ -98,6 +75,10 @@ class PJHomeMapAnnotationView: MAAnnotationView, PJHomeMapCalloutViewDelegate {
             if (calloutView?.shareBtn.bounds.contains(sharePoint!))! {
                 return calloutView?.shareBtn
             }
+            let calloutPoint = calloutView?.convert(point, from: self)
+            if (calloutView?.bounds.contains(calloutPoint!))! {
+                return calloutView
+            }
         }
         return super.hitTest(point, with: event)
     }
@@ -114,19 +95,8 @@ class PJHomeMapAnnotationView: MAAnnotationView, PJHomeMapCalloutViewDelegate {
     }
     
     
-    // MARK: setter and getter
-    private func willSetTitle(_ title: String) {
-        calloutView?.title = title
-    }
-    
-    
-    private func willSetImageName(_ imageName: String) {
-        calloutView?.imageName = imageName
-    }
-
-    
-    private func willSetTemperature(_ t: String) {
-        calloutView?.temperature = t
+    func homeMapCalloutTapped(callout: PJHomeMapCalloutView) {
+        viewDelegate?.homeMapAnnotationViewTappedView!(annotationView: callout)
     }
     
 }

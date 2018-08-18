@@ -35,6 +35,8 @@ class PJHomeViewController: UIViewController, PJHomeBottomViewDelegate, PJMapVie
         super.didReceiveMemoryWarning()
     }
     
+    
+    // MARK: life cycle
     private func initView() {
         mapView = PJHomeMapView.init(frame: CGRect(x: 0, y: 0, width: PJSCREEN_WIDTH, height: PJSCREEN_HEIGHT))
         mapView?.viewDelegate = self
@@ -43,6 +45,18 @@ class PJHomeViewController: UIViewController, PJHomeBottomViewDelegate, PJMapVie
         bottomView = PJHomeBottomView.init(frame: CGRect(x: -PJSCREEN_WIDTH * 0.1, y: PJSCREEN_HEIGHT - 120, width: PJSCREEN_WIDTH * 1.2, height: 160))
         bottomView?.viewDelegate = self
         view.addSubview(bottomView!)
+        
+        // 读取 Annotation 缓存
+        let caches = PJCoreDataHelper.shared.allAnnotation()
+        if caches.count != 0 {
+            mapView?.models = caches
+            mapView?.isCache = true
+            for annotation in caches {
+                let pointAnnotation = MAPointAnnotation()
+                pointAnnotation.coordinate = CLLocationCoordinate2D.init(latitude: Double(annotation.latitude)!, longitude: Double(annotation.longitude)!)
+                mapView?.mapView.addAnnotation(pointAnnotation)
+            }
+        }
     }
     
     func homeBottomViewPlacesBtnClick(view: PJHomeBottomView) {
@@ -82,6 +96,7 @@ class PJHomeViewController: UIViewController, PJHomeBottomViewDelegate, PJMapVie
                                 }, completion: { (finished) in
                                     if finished {
                                         tempTapImageView.removeFromSuperview()
+                                        self.mapView?.isCache = false
                                         
                                         let pointAnnotation = MAPointAnnotation()
                                         pointAnnotation.coordinate = (self.mapView?.mapView.userLocation.location.coordinate)!
