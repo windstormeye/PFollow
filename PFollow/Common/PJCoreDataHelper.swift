@@ -32,6 +32,8 @@ class PJCoreDataHelper: NSObject {
         annotationEntity.latitude = model.latitude
         annotationEntity.longitude = model.longitude
         annotationEntity.tag = model.tag
+        annotationEntity.altitude = model.altitude
+        annotationEntity.stepCount = model.stepCount
         
         do {
             try context?.save()
@@ -57,6 +59,8 @@ class PJCoreDataHelper: NSObject {
                     "latitude": info.latitude,
                     "longitude": info.longitude,
                     "tag": info.tag,
+                    "altitude": info.altitude,
+                    "stepCount": info.stepCount,
                 ]
                 
                 if let json = try? JSONSerialization.data(withJSONObject: data, options: []) {

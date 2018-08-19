@@ -102,6 +102,13 @@ class PJHomeViewController: UIViewController, PJHomeBottomViewDelegate, PJMapVie
     }
     
     
+    func mapViewTappedCalloutView(_ mapView: PJHomeMapView, annotationView: PJHomeMapAnnotationView) {
+        let vc = PJAnnotationDetailsViewController()
+        vc.annotationModel = annotationView.model
+        navigationController?.pushViewController(vc, animated: true)
+    }
+    
+    
     func mapView(_ mapView: PJHomeMapView, rotateDegree: CGFloat) {
         // 调整指南针选择方向角度
         bottomView?.rotateDegree = (rotateDegree - 45)

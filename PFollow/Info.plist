@@ -2,8 +2,10 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>NSMotionUsageDescription</key>
+	<string>PFollow 需要获取您的健康信息以显示步数</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>PFollow 需要获取您的地理位置以标识大头针</string>
+	<string>PFollow 需要获取您的地理位置信息以标识大头针和海拔高度</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleExecutable</key>

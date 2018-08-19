@@ -7,11 +7,13 @@
 //
 
 import UIKit
+import CoreMotion
 
 @objc protocol PJMapViewDelete {
     @objc optional func mapView(_ mapView: PJHomeMapView, rotateDegree: CGFloat)
     @objc optional func mapView(_ mapView: PJHomeMapView, isRequested: Bool)
     @objc optional func mapViewInitComplate(_ mapView: PJHomeMapView)
+    @objc optional func mapViewTappedCalloutView(_ mapView: PJHomeMapView, annotationView: PJHomeMapAnnotationView)
 }
 
 class PJHomeMapView: UIView, MAMapViewDelegate, AMapSearchDelegate, PJHomeMapAnnotationViewDelegate {
@@ -29,6 +31,8 @@ class PJHomeMapView: UIView, MAMapViewDelegate, AMapSearchDelegate, PJHomeMapAnn
     private var currentCalloutView: PJHomeMapAnnotationView?
     private var currentAnnotationModel: AnnotationModel?
     private var currentrAnnotation: MAAnnotation?
+    private var pedometer = CMPedometer()
+
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -50,6 +54,7 @@ class PJHomeMapView: UIView, MAMapViewDelegate, AMapSearchDelegate, PJHomeMapAnn
         mapView.showsUserLocation = true
         // 用户模式跟踪
         mapView.userTrackingMode = .follow
+        addSubview(mapView)
         
         r.image = UIImage(named: "home_map_userlocation")
         r.showsAccuracyRing = false
@@ -60,12 +65,40 @@ class PJHomeMapView: UIView, MAMapViewDelegate, AMapSearchDelegate, PJHomeMapAnn
         let jsonData = NSData.init(contentsOfFile: path)
         mapView.setCustomMapStyleWithWebData(jsonData as Data?)
         
-        addSubview(mapView)
     }
     
     
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
+    }
+    
+    
+    private func getPedonmeterData(json: [String: String]) {
+        pedometer = CMPedometer()
+        if CMPedometer.isStepCountingAvailable(){
+            let calendar = Calendar.current
+            let now = Date()
+            let components = calendar.dateComponents([.year, .month, .day], from: now)
+            let startDate = calendar.date(from: components)
+            pedometer.queryPedometerData(from: startDate!, to: Date(), withHandler: { (data, error) in
+                if error != nil{
+                    print("/(error?.localizedDescription)")
+                }else{
+                    if data != nil {
+                        var json = json
+                        json["stepCount"] = String(Int(truncating: (data?.numberOfSteps)!))
+                        if let json = try? JSONSerialization.data(withJSONObject: json, options: []) {
+                            if let annotationModel = try? JSONDecoder().decode(AnnotationModel.self, from: json) {
+                                self.currentCalloutView?.model = annotationModel
+                                DispatchQueue.main.async {
+                                    self.viewDelegate?.mapView!(self, isRequested: PJCoreDataHelper.shared.addAnnotation(model: annotationModel))
+                                }
+                            }
+                        }
+                    }
+                }
+            })
+        }
     }
     
     
@@ -81,6 +114,7 @@ class PJHomeMapView: UIView, MAMapViewDelegate, AMapSearchDelegate, PJHomeMapAnn
     
     
     func mapView(_ mapView: MAMapView!, viewFor annotation: MAAnnotation!) -> MAAnnotationView! {
+        // 用户标签则 nil
         if annotation.isKind(of: MAUserLocation.self) {
             return nil
         }
@@ -156,8 +190,8 @@ class PJHomeMapView: UIView, MAMapViewDelegate, AMapSearchDelegate, PJHomeMapAnn
     }
     
     
-    func homeMapAnnotationViewTappedView(annotationView: PJHomeMapCalloutView) {
-        print("2332134")
+    func homeMapAnnotationViewTappedView(calloutView: PJHomeMapCalloutView, annotationView: PJHomeMapAnnotationView) {
+        viewDelegate?.mapViewTappedCalloutView!(self, annotationView: annotationView)
     }
     
     
@@ -187,22 +221,16 @@ class PJHomeMapView: UIView, MAMapViewDelegate, AMapSearchDelegate, PJHomeMapAnn
         
         let annotationTag =  currentCalloutView?.tag
         
-        let data = [
+        let data: [String: String] = [
             "createdTimeString": timeFormatter.string(from: Date()) as String,
             "weatherString": response.lives[0].weather,
             "environmentString": environmentString,
             "latitude": String(Double((currentrAnnotation?.coordinate.latitude)!)),
             "longitude": String(Double((currentrAnnotation?.coordinate.longitude)!)),
             "tag": String(annotationTag!),
+            "altitude": String(Int(mapView.userLocation.location.altitude))
             ]
-        
-        if let json = try? JSONSerialization.data(withJSONObject: data, options: []) {
-            if let annotationModel = try? JSONDecoder().decode(AnnotationModel.self, from: json) {
-                currentCalloutView?.model = annotationModel
-                viewDelegate?.mapView!(self, isRequested: PJCoreDataHelper.shared.addAnnotation(model: annotationModel))
-            }
-        }
-        
+        getPedonmeterData(json: data)
     }
     
     

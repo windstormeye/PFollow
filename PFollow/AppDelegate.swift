@@ -18,7 +18,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         
         window = UIWindow.init(frame: UIScreen.main.bounds)
-        window?.rootViewController = PJHomeViewController()
+        let navigationControllrt = UINavigationController.init(rootViewController: PJHomeViewController())
+        window?.rootViewController = navigationControllrt
         window?.makeKeyAndVisible()
         
         AMapServices.shared().apiKey = "9481ea9de167f7b11a192b11b620dd84"

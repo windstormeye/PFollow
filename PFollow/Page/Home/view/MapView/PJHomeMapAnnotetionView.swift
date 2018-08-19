@@ -11,10 +11,10 @@ import UIKit
 @objc protocol PJHomeMapAnnotationViewDelegate {
     @objc optional func homeMapAnnotationView(annotationView: PJHomeMapAnnotationView, removeAnnotaion: MAAnnotation)
     @objc optional func homeMapAnnotationView(annotationView: PJHomeMapAnnotationView, shareAnnotaion: MAAnnotation)
-    @objc optional func homeMapAnnotationViewTappedView(annotationView: PJHomeMapCalloutView)
+    @objc optional func homeMapAnnotationViewTappedView(calloutView: PJHomeMapCalloutView, annotationView: PJHomeMapAnnotationView)
 }
 
-class PJHomeMapAnnotationView: MAAnnotationView, PJHomeMapCalloutViewDelegate {
+class PJHomeMapAnnotationView: MAAnnotationView, PJHomeMapCalloutViewDelegate, CAAnimationDelegate {
     
     var viewDelegate: PJHomeMapAnnotationViewDelegate?
     var model: AnnotationModel?
@@ -28,11 +28,14 @@ class PJHomeMapAnnotationView: MAAnnotationView, PJHomeMapCalloutViewDelegate {
         super.init(annotation: annotation, reuseIdentifier: reuseIdentifier)
     }
     
+    
     required init?(coder aDecoder: NSCoder) {
         model = nil
         super.init(coder: aDecoder)
     }
     
+    
+    // MARK: override
     override func setSelected(_ selected: Bool, animated: Bool) {
         if self.isSelected == selected {
             return
@@ -84,6 +87,27 @@ class PJHomeMapAnnotationView: MAAnnotationView, PJHomeMapCalloutViewDelegate {
     }
     
     
+    override func willMove(toSuperview newSuperview: UIView?) {
+        super.willMove(toSuperview: newSuperview)
+        
+        // 防止删除大头针的时候调用该方法，传入 nil
+        if newSuperview == nil {
+            return
+        }
+        
+        if(newSuperview?.bounds.contains(self.center))! {
+            let growAnimation = CABasicAnimation.init(keyPath: "transform.scale")
+            growAnimation.delegate = self
+            growAnimation.duration = 0.25;
+            growAnimation.timingFunction = CAMediaTimingFunction.init(name: kCAMediaTimingFunctionLinear)
+            growAnimation.fromValue = 0
+            growAnimation.toValue = 1.0
+            
+            self.layer.add(growAnimation, forKey: "growAnimation")
+        }
+    }
+    
+    
     // MARK: delegate
     func homeMapCalloutRemoveAnnotation(callout: PJHomeMapCalloutView) {
         viewDelegate?.homeMapAnnotationView!(annotationView: self, removeAnnotaion: self.annotation)
@@ -96,7 +120,7 @@ class PJHomeMapAnnotationView: MAAnnotationView, PJHomeMapCalloutViewDelegate {
     
     
     func homeMapCalloutTapped(callout: PJHomeMapCalloutView) {
-        viewDelegate?.homeMapAnnotationViewTappedView!(annotationView: callout)
+        viewDelegate?.homeMapAnnotationViewTappedView!(calloutView: callout, annotationView: self)
     }
     
 }

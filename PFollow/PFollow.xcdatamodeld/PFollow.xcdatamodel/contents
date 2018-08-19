@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="14135" systemVersion="17E199" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
     <entity name="Annotation" representedClassName="Annotation" syncable="YES" codeGenerationType="class">
+        <attribute name="altitude" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="created_time" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="environment" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="latitude" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="longitude" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="stepCount" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="tag" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="weather" optional="YES" attributeType="String" syncable="YES"/>
         <relationship name="annotationToOneCity" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="AnnotationCity" inverseName="cityToManyAnnotation" inverseEntity="AnnotationCity" syncable="YES"/>
@@ -21,7 +23,7 @@
         <relationship name="imageToOneAnnotation" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Annotation" inverseName="annotationToOneImage" inverseEntity="Annotation" syncable="YES"/>
     </entity>
     <elements>
-        <element name="Annotation" positionX="-63" positionY="-18" width="128" height="165"/>
+        <element name="Annotation" positionX="-63" positionY="-18" width="128" height="195"/>
         <element name="AnnotationCity" positionX="-54" positionY="27" width="128" height="75"/>
         <element name="AnnotationImage" positionX="-54" positionY="36" width="128" height="90"/>
         <element name="AnnotationContent" positionX="-45" positionY="54" width="128" height="45"/>
