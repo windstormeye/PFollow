@@ -5,6 +5,7 @@
         <attribute name="environment" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="latitude" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="longitude" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="tag" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="weather" optional="YES" attributeType="String" syncable="YES"/>
         <relationship name="annotationToOneCity" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="AnnotationCity" inverseName="cityToManyAnnotation" inverseEntity="AnnotationCity" syncable="YES"/>
         <relationship name="annotationToOneImage" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="AnnotationImage" inverseName="imageToOneAnnotation" inverseEntity="AnnotationImage" syncable="YES"/>
@@ -20,7 +21,7 @@
         <relationship name="imageToOneAnnotation" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Annotation" inverseName="annotationToOneImage" inverseEntity="Annotation" syncable="YES"/>
     </entity>
     <elements>
-        <element name="Annotation" positionX="-63" positionY="-18" width="128" height="150"/>
+        <element name="Annotation" positionX="-63" positionY="-18" width="128" height="165"/>
         <element name="AnnotationCity" positionX="-54" positionY="27" width="128" height="75"/>
         <element name="AnnotationImage" positionX="-54" positionY="36" width="128" height="90"/>
         <element name="AnnotationContent" positionX="-45" positionY="54" width="128" height="45"/>

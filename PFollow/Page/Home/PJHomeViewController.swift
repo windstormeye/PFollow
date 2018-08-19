@@ -24,9 +24,9 @@ class PJHomeViewController: UIViewController, PJHomeBottomViewDelegate, PJMapVie
         // 视图载入完成后，设置地图缩放等级
         mapView?.mapView.setZoomLevel(15, animated: true)
         
-        if bottomView?.stackView?.alpha == 0 {
+        if bottomView?.tapBtn.alpha == 0 {
             UIView.animate(withDuration: 0.25) {
-                self.bottomView?.stackView?.alpha = 1
+                self.bottomView?.tapBtn.alpha = 1
             }
         }
     }
@@ -45,23 +45,13 @@ class PJHomeViewController: UIViewController, PJHomeBottomViewDelegate, PJMapVie
         bottomView = PJHomeBottomView.init(frame: CGRect(x: -PJSCREEN_WIDTH * 0.1, y: PJSCREEN_HEIGHT - 120, width: PJSCREEN_WIDTH * 1.2, height: 160))
         bottomView?.viewDelegate = self
         view.addSubview(bottomView!)
-        
-        // 读取 Annotation 缓存
-        let caches = PJCoreDataHelper.shared.allAnnotation()
-        if caches.count != 0 {
-            mapView?.models = caches
-            mapView?.isCache = true
-            for annotation in caches {
-                let pointAnnotation = MAPointAnnotation()
-                pointAnnotation.coordinate = CLLocationCoordinate2D.init(latitude: Double(annotation.latitude)!, longitude: Double(annotation.longitude)!)
-                mapView?.mapView.addAnnotation(pointAnnotation)
-            }
-        }
     }
     
+    
+    // MARK: delegate
     func homeBottomViewPlacesBtnClick(view: PJHomeBottomView) {
         UIView.animate(withDuration: 0.25, animations: {
-            self.bottomView?.stackView?.alpha = 0
+            self.bottomView?.tapBtn.alpha = 0
         }) { (finished) in
             if finished {
                 self.present(PJPlacesViewController(), animated: true, completion: nil)
@@ -71,7 +61,7 @@ class PJHomeViewController: UIViewController, PJHomeBottomViewDelegate, PJMapVie
     
     
     func homeBottomViewTapBtnClick(view: PJHomeBottomView, tapBtn: UIButton) {
-        PJTapic.tap()
+        bottomView?.isRequest = true
         UIView.animate(withDuration: 0.15, animations: {
             tapBtn.transform = CGAffineTransform(scaleX: 1.2, y: 1.2)
         }) { (finished) in
@@ -82,7 +72,7 @@ class PJHomeViewController: UIViewController, PJHomeBottomViewDelegate, PJMapVie
                     if finished {
                         let point = self.mapView?.mapView.convert((self.mapView?.mapView.userLocation.location.coordinate)!, toPointTo: self.mapView)
                         print(point as Any)
-                        let tempTapImageView = UIImageView(image: UIImage(named: "home_tap_cover"))
+                        let tempTapImageView = UIImageView(image: UIImage(named: "home_tap"))
                         tempTapImageView.frame.size = CGSize(width: 50, height: 50)
                         tempTapImageView.centerX = view.centerX
                         tempTapImageView.bottom = (self.bottomView?.bottom)!
@@ -111,9 +101,35 @@ class PJHomeViewController: UIViewController, PJHomeBottomViewDelegate, PJMapVie
         }
     }
     
+    
     func mapView(_ mapView: PJHomeMapView, rotateDegree: CGFloat) {
-        bottomView?.rotateDegree = rotateDegree
+        // 调整指南针选择方向角度
+        bottomView?.rotateDegree = (rotateDegree - 45)
     }
+    
+    
+    func mapView(_ mapView: PJHomeMapView, isRequested: Bool) {
+        // 如果失败要给 HUD 提示
+        if isRequested {
+            bottomView?.isRequest = !isRequested
+        }
+    }
+
+    
+    func mapViewInitComplate(_ mapView: PJHomeMapView) {
+        // 读取 Annotation 缓存
+        let caches = PJCoreDataHelper.shared.allAnnotation()
+        if caches.count != 0 {
+            mapView.models = caches
+            mapView.isCache = true
+            for annotation in caches {
+                let pointAnnotation = MAPointAnnotation()
+                pointAnnotation.coordinate = CLLocationCoordinate2D.init(latitude: Double(annotation.latitude)!, longitude: Double(annotation.longitude)!)
+                mapView.mapView.addAnnotation(pointAnnotation)
+            }
+        }
+    }
+    
     
     override var preferredStatusBarStyle: UIStatusBarStyle {
         return .lightContent

@@ -15,4 +15,5 @@ struct AnnotationModel: Codable {
     var environmentString: String
     var latitude: String
     var longitude: String
+    var tag: String
 }

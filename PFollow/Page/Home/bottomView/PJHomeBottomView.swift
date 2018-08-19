@@ -16,68 +16,86 @@ import UIKit
 class PJHomeBottomView: UIView {
 
     var viewDelegate: PJHomeBottomViewDelegate?
-    private(set) var stackView: UIStackView?
-    
-    private var tapBtn = UIButton()
-    
     var rotateDegree:CGFloat{
         set {
-            self.tapBtn.transform = CGAffineTransform(rotationAngle: newValue * .pi / 180.0)
+            self.compassImageView.transform = CGAffineTransform(rotationAngle: newValue * .pi / 180.0)
         }
         get {
             return self.rotateDegree
         }
     }
     
+    var isRequest: Bool {
+        willSet(b) {
+            willSetIsRequest(b)
+        }
+    }
+    
+    private(set) var tapBtn = UIButton()
+    private(set) var addAnnotationOKImageView = UIImageView()
+    
+    private var compassImageView = UIImageView()
+    private var indicator = UIActivityIndicatorView(activityIndicatorStyle: .gray)
+    
+    // MARK: life cycle
     override init(frame: CGRect) {
+        isRequest = false
         super.init(frame: frame)
         initView()
     }
     
+    
     required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        isRequest = false
+        super.init(coder: aDecoder)
     }
+    
     
     private func initView() {
         let backView = UIImageView(frame: CGRect(x: 0, y: 0, width: width, height: height))
         addSubview(backView)
+        backView.isUserInteractionEnabled = true
         backView.image = UIImage(named: "home_cloud")
         
-        stackView = UIStackView(frame: CGRect(x: PJSCREEN_WIDTH * 0.1, y: 30,
-                                                  width: PJSCREEN_WIDTH, height: 100))
-        stackView?.axis = .horizontal
-        stackView?.alignment = .fill
-        stackView?.distribution = .fillEqually
-        stackView?.spacing = -50
-        addSubview(stackView!)
+        let tapped = UITapGestureRecognizer(target: self, action: #selector(placesBtnClick))
+        backView.addGestureRecognizer(tapped)
         
-        let placesBtn = UIButton()
-        placesBtn.layer.shadowColor = UIColor.black.cgColor
-        placesBtn.layer.shadowRadius = 5
-        placesBtn.layer.shadowOpacity = 0.3
-        placesBtn.layer.shadowOffset = CGSize(width: 0, height: 2)
-        placesBtn.setImage(UIImage(named: "home_places"), for: .normal)
-        placesBtn.addTarget(self, action: #selector(placesBtnClick), for: .touchUpInside)
-        stackView?.addArrangedSubview(placesBtn)
-        
+        tapBtn.width = 70
+        tapBtn.height = 70
+        // 0.1 为 cloud 的放大偏移量
+        tapBtn.centerX = self.centerX + PJSCREEN_WIDTH * 0.1
+        tapBtn.y = 40
         tapBtn.layer.shadowColor = UIColor.black.cgColor
         tapBtn.layer.shadowRadius = 5
         tapBtn.layer.shadowOpacity = 0.3
         tapBtn.layer.shadowOffset = CGSize(width: 0, height: 2)
         tapBtn.setImage(UIImage(named: "home_tap"), for: .normal)
         tapBtn.addTarget(self, action: #selector(tapBtnClick(sender:)), for: .touchUpInside)
-        stackView?.addArrangedSubview(tapBtn)
+        addSubview(tapBtn)
         
-        let friendBtn = UIButton()
-        friendBtn.layer.shadowColor = UIColor.black.cgColor
-        friendBtn.layer.shadowRadius = 5
-        friendBtn.layer.shadowOpacity = 0.3
-        friendBtn.layer.shadowOffset = CGSize(width: 0, height: 2)
-        friendBtn.setImage(UIImage(named: "home_friend"), for: .normal)
-        friendBtn.addTarget(self, action: #selector(friendBtnClick), for: .touchUpInside)
-        stackView?.addArrangedSubview(friendBtn)
+        compassImageView.width = 30
+        compassImageView.height = 30
+        compassImageView.center = tapBtn.center
+        compassImageView.image = UIImage(named: "home_bottom_compass")
+        addSubview(compassImageView)
+        
+        addAnnotationOKImageView.width = 30
+        addAnnotationOKImageView.height = 30
+        addAnnotationOKImageView.center = tapBtn.center
+        addAnnotationOKImageView.image = UIImage(named: "home_tap_ok")
+        addSubview(addAnnotationOKImageView)
+        addAnnotationOKImageView.isHidden = true
+        addAnnotationOKImageView.alpha = 0
+        
+        indicator.width = 30
+        indicator.height = 30
+        indicator.center = tapBtn.center
+        addSubview(indicator)
+        indicator.isHidden = true
     }
     
+    
+    // MARK: Action
     @objc private func tapBtnClick(sender: UIButton) {
         print("tap")
         viewDelegate?.homeBottomViewTapBtnClick!(view: self, tapBtn: sender)
@@ -90,6 +108,38 @@ class PJHomeBottomView: UIView {
     
     @objc private func friendBtnClick() {
         print("friend")
+    }
+    
+    
+    private func willSetIsRequest(_ b: Bool) {
+        if b {
+            tapBtn.isEnabled = false
+            compassImageView.isHidden = true
+            indicator.isHidden = false
+            indicator.startAnimating()
+        } else {
+            indicator.isHidden = true
+            indicator.stopAnimating()
+            addAnnotationOKImageView.isHidden = false
+            UIView.animate(withDuration: 0.25, animations: {
+                self.addAnnotationOKImageView.alpha = 1.0
+                self.addAnnotationOKImageView.transform = CGAffineTransform(scaleX: 1.3, y: 1.3)
+                PJTapic.tap()
+            }) { (finished) in
+                self.addAnnotationOKImageView.transform = CGAffineTransform(scaleX: 1, y: 1)
+                PJTapic.tipsTap()
+                
+                UIView.animate(withDuration: 0.25, delay: 0.5, options: .curveEaseIn    , animations: {
+                    self.addAnnotationOKImageView.alpha = 0
+                }, completion: { (finished) in
+                    if finished {
+                        self.addAnnotationOKImageView.isHidden = true
+                        self.compassImageView.isHidden = false
+                        self.tapBtn.isEnabled = true
+                    }
+                })
+            }
+        }
     }
 
 }

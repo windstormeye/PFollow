@@ -112,6 +112,16 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		74BB7A90212903B400E02562 /* view */ = {
+			isa = PBXGroup;
+			children = (
+				74E67E552120083B007C68F7 /* PJHomeMapView.swift */,
+				748881872125B6D800B8814D /* PJHomeMapAnnotetionView.swift */,
+				74888185212314FF00B8814D /* PJHomeMapCalloutView.swift */,
+			);
+			path = view;
+			sourceTree = "<group>";
+		};
 		74D0712E21281171007A04A7 /* InfoFlow */ = {
 			isa = PBXGroup;
 			children = (
@@ -218,10 +228,8 @@
 		74E67E542120082D007C68F7 /* MapView */ = {
 			isa = PBXGroup;
 			children = (
+				74BB7A90212903B400E02562 /* view */,
 				74D07133212852E8007A04A7 /* model */,
-				74E67E552120083B007C68F7 /* PJHomeMapView.swift */,
-				748881872125B6D800B8814D /* PJHomeMapAnnotetionView.swift */,
-				74888185212314FF00B8814D /* PJHomeMapCalloutView.swift */,
 			);
 			path = MapView;
 			sourceTree = "<group>";

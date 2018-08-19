@@ -11,6 +11,7 @@ import CoreData
 
 class PJCoreDataHelper: NSObject {
     
+    // 单例
     static let shared = PJCoreDataHelper()
     
     private let delegate = UIApplication.shared.delegate as! AppDelegate
@@ -30,6 +31,7 @@ class PJCoreDataHelper: NSObject {
         annotationEntity.environment = model.environmentString
         annotationEntity.latitude = model.latitude
         annotationEntity.longitude = model.longitude
+        annotationEntity.tag = model.tag
         
         do {
             try context?.save()
@@ -54,6 +56,7 @@ class PJCoreDataHelper: NSObject {
                     "environmentString": info.environment,
                     "latitude": info.latitude,
                     "longitude": info.longitude,
+                    "tag": info.tag,
                 ]
                 
                 if let json = try? JSONSerialization.data(withJSONObject: data, options: []) {
@@ -68,6 +71,28 @@ class PJCoreDataHelper: NSObject {
         catch {
             print("查询失败：\(error)")
             return []
+        }
+    }
+    
+    
+    func deleteAnnotation(model: AnnotationModel) {
+        let fetchRequest = NSFetchRequest<Annotation>(entityName:"Annotation")
+        let coordinate = NSPredicate(format: "tag=\(model.tag)")
+        fetchRequest.predicate = coordinate
+        do {
+            let fetchedObjects = try context?.fetch(fetchRequest)
+            for instance in fetchedObjects! {
+                context?.delete(instance)
+            }
+        } catch {
+            print("删除查询出错：\(error)")
+            print("查询成功")
+        }
+        do {
+            try context?.save()
+            print("删除成功")
+        } catch {
+            print("删除出错:\(error)")
         }
     }
     

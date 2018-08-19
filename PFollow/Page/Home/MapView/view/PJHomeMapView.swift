@@ -10,6 +10,8 @@ import UIKit
 
 @objc protocol PJMapViewDelete {
     @objc optional func mapView(_ mapView: PJHomeMapView, rotateDegree: CGFloat)
+    @objc optional func mapView(_ mapView: PJHomeMapView, isRequested: Bool)
+    @objc optional func mapViewInitComplate(_ mapView: PJHomeMapView)
 }
 
 class PJHomeMapView: UIView, MAMapViewDelegate, AMapSearchDelegate, PJHomeMapAnnotationViewDelegate {
@@ -124,6 +126,8 @@ class PJHomeMapView: UIView, MAMapViewDelegate, AMapSearchDelegate, PJHomeMapAnn
     
     
     func homeMapAnnotationView(annotationView: PJHomeMapAnnotationView, removeAnnotaion: MAAnnotation) {
+        PJCoreDataHelper.shared.deleteAnnotation(model: annotationView.model!)
+        
         UIView.animate(withDuration: 0.2, animations: {
             annotationView.y -= 15
         }) { (finished) in
@@ -181,18 +185,21 @@ class PJHomeMapView: UIView, MAMapViewDelegate, AMapSearchDelegate, PJHomeMapAnn
         let timeFormatter = DateFormatter()
         timeFormatter.dateFormat = "yyyy-MM-dd"
         
+        let annotationTag =  currentCalloutView?.tag
+        
         let data = [
             "createdTimeString": timeFormatter.string(from: Date()) as String,
             "weatherString": response.lives[0].weather,
             "environmentString": environmentString,
             "latitude": String(Double((currentrAnnotation?.coordinate.latitude)!)),
             "longitude": String(Double((currentrAnnotation?.coordinate.longitude)!)),
+            "tag": String(annotationTag!),
             ]
         
         if let json = try? JSONSerialization.data(withJSONObject: data, options: []) {
             if let annotationModel = try? JSONDecoder().decode(AnnotationModel.self, from: json) {
                 currentCalloutView?.model = annotationModel
-                PJCoreDataHelper.shared.addAnnotation(model: annotationModel)
+                viewDelegate?.mapView!(self, isRequested: PJCoreDataHelper.shared.addAnnotation(model: annotationModel))
             }
         }
         
@@ -201,6 +208,10 @@ class PJHomeMapView: UIView, MAMapViewDelegate, AMapSearchDelegate, PJHomeMapAnn
     
     func aMapSearchRequest(_ request: Any!, didFailWithError error: Error!) {
         print("Error:\(error)")
+    }
+    
+    func mapInitComplete(_ mapView: MAMapView!) {
+        viewDelegate?.mapViewInitComplate!(self)
     }
     
 }
