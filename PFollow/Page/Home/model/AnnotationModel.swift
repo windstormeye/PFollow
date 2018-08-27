@@ -26,4 +26,8 @@ struct AnnotationModel: Codable {
     var altitude: String
     // 步数
     var stepCount: String
+    // 城市
+    var city: String
+    // 格式化地址
+    var formatterAddress: String
 }

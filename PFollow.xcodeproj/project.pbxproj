@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0C13EB3A213412F600FB2857 /* PJBaseViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C13EB39213412F600FB2857 /* PJBaseViewController.swift */; };
 		62A516DDBB5C6106632BC865 /* libPods-PFollow.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E8886EABC65D6A99C5B97FE5 /* libPods-PFollow.a */; };
 		74888186212314FF00B8814D /* PJHomeMapCalloutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74888185212314FF00B8814D /* PJHomeMapCalloutView.swift */; };
 		748881882125B6D800B8814D /* PJHomeMapAnnotetionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 748881872125B6D800B8814D /* PJHomeMapAnnotetionView.swift */; };
@@ -49,6 +50,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		0C13EB39213412F600FB2857 /* PJBaseViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PJBaseViewController.swift; sourceTree = "<group>"; };
 		2FAB104A06AD7BB86EFBA6F4 /* Pods-PFollow.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PFollow.release.xcconfig"; path = "Pods/Target Support Files/Pods-PFollow/Pods-PFollow.release.xcconfig"; sourceTree = "<group>"; };
 		74888185212314FF00B8814D /* PJHomeMapCalloutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PJHomeMapCalloutView.swift; sourceTree = "<group>"; };
 		748881872125B6D800B8814D /* PJHomeMapAnnotetionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PJHomeMapAnnotetionView.swift; sourceTree = "<group>"; };
@@ -110,6 +112,22 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		0C13EB3B21341CB900FB2857 /* Flow */ = {
+			isa = PBXGroup;
+			children = (
+				74D0712F212811A1007A04A7 /* PJInfoFlowViewController.swift */,
+			);
+			path = Flow;
+			sourceTree = "<group>";
+		};
+		0C13EB3C21341CC200FB2857 /* Details */ = {
+			isa = PBXGroup;
+			children = (
+				74BB7A9A2129AA4400E02562 /* PJAnnotationDetailsViewController.swift */,
+			);
+			path = Details;
+			sourceTree = "<group>";
+		};
 		3745F555965D8316E0827EBF /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -147,8 +165,8 @@
 		74BB7A9421296AEC00E02562 /* controller */ = {
 			isa = PBXGroup;
 			children = (
-				74D0712F212811A1007A04A7 /* PJInfoFlowViewController.swift */,
-				74BB7A9A2129AA4400E02562 /* PJAnnotationDetailsViewController.swift */,
+				0C13EB3C21341CC200FB2857 /* Details */,
+				0C13EB3B21341CB900FB2857 /* Flow */,
 			);
 			path = controller;
 			sourceTree = "<group>";
@@ -233,6 +251,7 @@
 				74E67E4921200539007C68F7 /* PJDefine.swift */,
 				74E67E44212004F3007C68F7 /* PJTools-UIView+Position.swift */,
 				74D0713121284DC7007A04A7 /* PJCoreDataHelper.swift */,
+				0C13EB39213412F600FB2857 /* PJBaseViewController.swift */,
 			);
 			path = Common;
 			sourceTree = "<group>";
@@ -480,6 +499,7 @@
 				74D07130212811A1007A04A7 /* PJInfoFlowViewController.swift in Sources */,
 				74BB7A9B2129AA4400E02562 /* PJAnnotationDetailsViewController.swift in Sources */,
 				74E67E5B2120137B007C68F7 /* PJHomeBottomView.swift in Sources */,
+				0C13EB3A213412F600FB2857 /* PJBaseViewController.swift in Sources */,
 				74E67E1C2120009A007C68F7 /* PFollow.xcdatamodeld in Sources */,
 				74E67E562120083B007C68F7 /* PJHomeMapView.swift in Sources */,
 				74E67E4A21200539007C68F7 /* PJDefine.swift in Sources */,

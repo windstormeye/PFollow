@@ -8,7 +8,7 @@
 
 import UIKit
 
-class PJHomeViewController: UIViewController, PJHomeBottomViewDelegate, PJMapViewDelete {
+class PJHomeViewController: PJBaseViewController, PJHomeBottomViewDelegate, PJMapViewDelete {
 
     var mapView: PJHomeMapView?
     var bottomView: PJHomeBottomView?
@@ -136,10 +136,4 @@ class PJHomeViewController: UIViewController, PJHomeBottomViewDelegate, PJMapVie
             }
         }
     }
-    
-    
-    override var preferredStatusBarStyle: UIStatusBarStyle {
-        return .lightContent
-    }
-
 }

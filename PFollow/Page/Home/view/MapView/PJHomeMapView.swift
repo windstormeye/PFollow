@@ -18,6 +18,8 @@ import CoreMotion
 
 class PJHomeMapView: UIView, MAMapViewDelegate, AMapSearchDelegate, PJHomeMapAnnotationViewDelegate {
 
+    static let PJNotificationName_annotation = Notification.Name("PJNotificationName_annotation")
+    
     var viewDelegate: PJMapViewDelete?
     var models = [AnnotationModel]()
     var isCache: Bool = false
@@ -26,17 +28,35 @@ class PJHomeMapView: UIView, MAMapViewDelegate, AMapSearchDelegate, PJHomeMapAnn
     
     private var currentCacheAnnotationIndex = 0
     private var r = MAUserLocationRepresentation()
-    private let search = AMapSearchAPI()
-    private let req = AMapWeatherSearchRequest()
     private var currentCalloutView: PJHomeMapAnnotationView?
     private var currentAnnotationModel: AnnotationModel?
     private var currentrAnnotation: MAAnnotation?
     private var pedometer = CMPedometer()
-
     
+    private let search = AMapSearchAPI()
+    private let req = AMapWeatherSearchRequest()
+    private var notificationRecoder = 0
+    private var finalModelDict = [String: String]()
+    
+    
+    // MARK: life cycle
     override init(frame: CGRect) {
         super.init(frame: frame)
+        initView()
         
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(messageQueueNotification(notify:)),
+                                               name: PJHomeMapView.PJNotificationName_annotation,
+                                               object: nil)
+    }
+    
+    
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+    }
+    
+    
+    fileprivate func initView() {
         AMapServices.shared().enableHTTPS = true
         
         search?.delegate = self
@@ -64,14 +84,30 @@ class PJHomeMapView: UIView, MAMapViewDelegate, AMapSearchDelegate, PJHomeMapAnn
         path.append("/mapView.data")
         let jsonData = NSData.init(contentsOfFile: path)
         mapView.setCustomMapStyleWithWebData(jsonData as Data?)
+    }
+    
+    
+    // MARK: notification
+    @objc private func messageQueueNotification(notify: Notification) {
+        var params = notify.userInfo as! [String: String]
+        if params["notifi_name"] == "city" {
+            notificationRecoder += 1
+            params.removeValue(forKey: "notifi_name")
+            finalModelDict.merge(params, uniquingKeysWith: { $1 })
+        }
+        
+        if params["notifi_name"] == "weather" {
+            params.removeValue(forKey: "notifi_name")
+            notificationRecoder += 1
+            finalModelDict.merge(params, uniquingKeysWith: { $1 })
+        }
+        
+        if notificationRecoder == 2 {
+            getPedonmeterData(json: finalModelDict)
+            notificationRecoder = 0
+        }
         
     }
-    
-    
-    required init?(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
-    }
-    
     
     private func getPedonmeterData(json: [String: String]) {
         pedometer = CMPedometer()
@@ -114,7 +150,7 @@ class PJHomeMapView: UIView, MAMapViewDelegate, AMapSearchDelegate, PJHomeMapAnn
     
     
     func mapView(_ mapView: MAMapView!, viewFor annotation: MAAnnotation!) -> MAAnnotationView! {
-        // 用户标签则 nil
+        // 若为用户标签则 nil
         if annotation.isKind(of: MAUserLocation.self) {
             return nil
         }
@@ -207,6 +243,14 @@ class PJHomeMapView: UIView, MAMapViewDelegate, AMapSearchDelegate, PJHomeMapAnn
             req.city = response.regeocode.addressComponent.city
             search?.aMapWeatherSearch(req)
             
+            let params: [String: String] = [
+                "notifi_name": "city",
+                
+                "city": response.regeocode.addressComponent.city,
+                "formatterAddress": response.regeocode.formattedAddress
+            ]
+            NotificationCenter.default.post(name: PJHomeMapView.PJNotificationName_annotation, object: nil, userInfo: params)
+            
             print(response.regeocode.addressComponent.city)
             print(response.regeocode.addressComponent.citycode)
         }
@@ -221,7 +265,9 @@ class PJHomeMapView: UIView, MAMapViewDelegate, AMapSearchDelegate, PJHomeMapAnn
         
         let annotationTag =  currentCalloutView?.tag
         
-        let data: [String: String] = [
+        let params: [String: String] = [
+            "notifi_name": "weather",
+            
             "createdTimeString": timeFormatter.string(from: Date()) as String,
             "weatherString": response.lives[0].weather,
             "environmentString": environmentString,
@@ -230,7 +276,7 @@ class PJHomeMapView: UIView, MAMapViewDelegate, AMapSearchDelegate, PJHomeMapAnn
             "tag": String(annotationTag!),
             "altitude": String(Int(mapView.userLocation.location.altitude))
             ]
-        getPedonmeterData(json: data)
+        NotificationCenter.default.post(name: PJHomeMapView.PJNotificationName_annotation, object: nil, userInfo: params)
     }
     
     

@@ -13,8 +13,8 @@ import Foundation
 // 屏幕宽高
 let PJSCREEN_HEIGHT = CGFloat(UIScreen.main.bounds.height)
 let PJSCREEN_WIDTH = CGFloat(UIScreen.main.bounds.width)
-
 let PJTABBAR_HEIGHT = CGFloat(48)
+let PJStatusHeight = UIApplication.shared.statusBarFrame.size.height
 
 // 位置相关
 func x(object: UIView) -> CGFloat {
