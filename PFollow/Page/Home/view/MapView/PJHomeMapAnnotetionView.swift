@@ -63,6 +63,7 @@ class PJHomeMapAnnotationView: MAAnnotationView, PJHomeMapCalloutViewDelegate, C
         } else {
             calloutView?.removeFromSuperview()
         }
+        
         super.setSelected(selected, animated: animated)
     }
 
@@ -85,7 +86,7 @@ class PJHomeMapAnnotationView: MAAnnotationView, PJHomeMapCalloutViewDelegate, C
         }
         return super.hitTest(point, with: event)
     }
-    
+
     
     override func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)

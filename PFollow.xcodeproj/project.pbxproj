@@ -51,10 +51,10 @@
 
 /* Begin PBXFileReference section */
 		0C13EB39213412F600FB2857 /* PJBaseViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PJBaseViewController.swift; sourceTree = "<group>"; };
+		0C13EB3D213569CE00FB2857 /* PFollow.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PFollow.entitlements; sourceTree = "<group>"; };
 		2FAB104A06AD7BB86EFBA6F4 /* Pods-PFollow.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PFollow.release.xcconfig"; path = "Pods/Target Support Files/Pods-PFollow/Pods-PFollow.release.xcconfig"; sourceTree = "<group>"; };
 		74888185212314FF00B8814D /* PJHomeMapCalloutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PJHomeMapCalloutView.swift; sourceTree = "<group>"; };
 		748881872125B6D800B8814D /* PJHomeMapAnnotetionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PJHomeMapAnnotetionView.swift; sourceTree = "<group>"; };
-		74BB7A952129756800E02562 /* PFollow.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PFollow.entitlements; sourceTree = "<group>"; };
 		74BB7A962129756800E02562 /* HealthKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HealthKit.framework; path = System/Library/Frameworks/HealthKit.framework; sourceTree = SDKROOT; };
 		74BB7A9A2129AA4400E02562 /* PJAnnotationDetailsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PJAnnotationDetailsViewController.swift; sourceTree = "<group>"; };
 		74D0712F212811A1007A04A7 /* PJInfoFlowViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PJInfoFlowViewController.swift; sourceTree = "<group>"; };
@@ -212,7 +212,7 @@
 		74E67E122120009A007C68F7 /* PFollow */ = {
 			isa = PBXGroup;
 			children = (
-				74BB7A952129756800E02562 /* PFollow.entitlements */,
+				0C13EB3D213569CE00FB2857 /* PFollow.entitlements */,
 				74E67E132120009A007C68F7 /* AppDelegate.swift */,
 				74E67E46212004F6007C68F7 /* Common */,
 				74E67E4B21200557007C68F7 /* Page */,

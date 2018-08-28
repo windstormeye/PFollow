@@ -132,6 +132,7 @@ class PJHomeViewController: PJBaseViewController, PJHomeBottomViewDelegate, PJMa
             for annotation in caches {
                 let pointAnnotation = MAPointAnnotation()
                 pointAnnotation.coordinate = CLLocationCoordinate2D.init(latitude: Double(annotation.latitude)!, longitude: Double(annotation.longitude)!)
+                
                 mapView.mapView.addAnnotation(pointAnnotation)
             }
         }

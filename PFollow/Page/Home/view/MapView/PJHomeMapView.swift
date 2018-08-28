@@ -163,17 +163,24 @@ class PJHomeMapView: UIView, MAMapViewDelegate, AMapSearchDelegate, PJHomeMapAnn
             
             if annotationView == nil {
                 annotationView = PJHomeMapAnnotationView(annotation: annotation, reuseIdentifier: annotationStyleReuseIndetifier)
+
             }
             annotationView?.image = UIImage(named: "home_map_makers_01_b")
             annotationView?.canShowCallout = false
             annotationView?.viewDelegate = self
+            // 该 tag 只是用于跟 userLocal 标记分开，不能唯一标识一个大头针
             annotationView?.tag = mapView.annotations.count + 1
             
             currentCalloutView = annotationView
             currentrAnnotation = annotation
             
             if isCache {
-                annotationView?.model = models[currentCacheAnnotationIndex]
+                for model in models {
+                    if Double(model.latitude) == annotationView?.annotation.coordinate.latitude &&
+                        Double(model.longitude) == annotationView?.annotation.coordinate.longitude {
+                        annotationView?.model = model
+                    }
+                }
                 return annotationView
             }
             
@@ -263,7 +270,6 @@ class PJHomeMapView: UIView, MAMapViewDelegate, AMapSearchDelegate, PJHomeMapAnn
         let timeFormatter = DateFormatter()
         timeFormatter.dateFormat = "yyyy-MM-dd"
         
-        let annotationTag =  currentCalloutView?.tag
         
         let params: [String: String] = [
             "notifi_name": "weather",
@@ -273,7 +279,6 @@ class PJHomeMapView: UIView, MAMapViewDelegate, AMapSearchDelegate, PJHomeMapAnn
             "environmentString": environmentString,
             "latitude": String(Double((currentrAnnotation?.coordinate.latitude)!)),
             "longitude": String(Double((currentrAnnotation?.coordinate.longitude)!)),
-            "tag": String(annotationTag!),
             "altitude": String(Int(mapView.userLocation.location.altitude))
             ]
         NotificationCenter.default.post(name: PJHomeMapView.PJNotificationName_annotation, object: nil, userInfo: params)

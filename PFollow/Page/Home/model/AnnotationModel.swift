@@ -20,8 +20,6 @@ struct AnnotationModel: Codable {
     var latitude: String
     // 精度
     var longitude: String
-    // 每条信息的 ID
-    var tag: String
     // 海拔高度
     var altitude: String
     // 步数

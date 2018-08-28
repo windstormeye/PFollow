@@ -31,7 +31,6 @@ class PJCoreDataHelper: NSObject {
         annotationEntity.environment = model.environmentString
         annotationEntity.latitude = model.latitude
         annotationEntity.longitude = model.longitude
-        annotationEntity.tag = model.tag
         annotationEntity.altitude = model.altitude
         annotationEntity.stepCount = model.stepCount
         annotationEntity.city = model.city
@@ -60,7 +59,6 @@ class PJCoreDataHelper: NSObject {
                     "environmentString": info.environment,
                     "latitude": info.latitude,
                     "longitude": info.longitude,
-                    "tag": info.tag,
                     "altitude": info.altitude,
                     "stepCount": info.stepCount,
                     "city": info.city,
@@ -85,7 +83,7 @@ class PJCoreDataHelper: NSObject {
     
     func deleteAnnotation(model: AnnotationModel) {
         let fetchRequest = NSFetchRequest<Annotation>(entityName:"Annotation")
-        let coordinate = NSPredicate(format: "tag=\(model.tag)")
+        let coordinate = NSPredicate(format: "longitude=\(model.longitude) and latitude=\(model.latitude)")
         fetchRequest.predicate = coordinate
         do {
             let fetchedObjects = try context?.fetch(fetchRequest)
@@ -101,6 +99,57 @@ class PJCoreDataHelper: NSObject {
             print("删除成功")
         } catch {
             print("删除出错:\(error)")
+        }
+    }
+    
+    
+    func annotationContent(model: AnnotationModel) -> String {
+        let fetchRequest = NSFetchRequest<AnnotationContent>(entityName:"AnnotationContent")
+        let contentPredicate = NSPredicate(format: "longitude=\(model.longitude) and latitude=\(model.latitude)")
+        fetchRequest.predicate = contentPredicate
+        do {
+            let fetchedObjects = try context?.fetch(fetchRequest)
+            print("查询成功")
+            return fetchedObjects?.first?.content ?? ""
+        }
+        catch {
+            print("查询失败：\(error)")
+            return ""
+        }
+    }
+    
+    
+    func addAnnotationContent(content: String, model: AnnotationModel) -> Bool {
+        let fetchRequest = NSFetchRequest<AnnotationContent>(entityName:"AnnotationContent")
+        let contentPredicate = NSPredicate(format: "longitude=\(model.longitude) and latitude=\(model.latitude)")
+        fetchRequest.predicate = contentPredicate
+        do {
+            let fetchedObjects = try context?.fetch(fetchRequest)
+            print("查询成功")
+            
+            let object = fetchedObjects?.first
+            
+            if object?.content != nil {
+                context?.delete(object!)
+            }
+            
+            let annotationEntity = NSEntityDescription.insertNewObject(forEntityName: "AnnotationContent", into: context!) as! AnnotationContent
+            annotationEntity.content = content
+            annotationEntity.longitude = model.longitude
+            annotationEntity.latitude = model.latitude
+            
+            do {
+                try context?.save()
+                print("保存成功")
+                return true
+            } catch {
+                print("不能保存：\(error)")
+                return false
+            }
+        }
+        catch {
+            print("查询失败：\(error)")
+            return false
         }
     }
     

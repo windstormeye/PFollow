@@ -20,7 +20,7 @@ class PJBaseViewController: UIViewController {
         navigationController?.navigationBar.setBackgroundImage(UIImage(), for: .default)
         navigationController?.navigationBar.shadowImage = UIImage()
         navigationController?.navigationBar.isTranslucent = true
-        
+        navigationController?.navigationBar.barStyle = .black
         // 自定义了 leftBarButtonItem ，需要
         navigationController?.interactivePopGestureRecognizer?.isEnabled = true
         navigationController?.interactivePopGestureRecognizer?.delegate = nil
@@ -56,7 +56,7 @@ class PJBaseViewController: UIViewController {
     
     func rightBarButtonItem(imageName: String, action: Selector) {
         let rightButton = UIButton(frame: CGRect(x: 0, y: 0, width: 40, height: 40))
-        rightButton.imageEdgeInsets = UIEdgeInsets(top: 0, left: -15, bottom: 0, right: 0)
+        rightButton.imageEdgeInsets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: -15)
         rightButton.setImage(UIImage(named: imageName), for: .normal)
         rightButton.addTarget(self, action: action, for: .touchUpInside)
         let rightBarButtonItem = UIBarButtonItem(customView: rightButton)
