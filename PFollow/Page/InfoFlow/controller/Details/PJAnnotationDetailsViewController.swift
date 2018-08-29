@@ -8,7 +8,7 @@
 
 import UIKit
 
-class PJAnnotationDetailsViewController: PJBaseViewController, UIScrollViewDelegate, UITextViewDelegate {
+class PJAnnotationDetailsViewController: PJBaseViewController, UIScrollViewDelegate, UITextViewDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
 
     var annotationModel: AnnotationModel? {
         willSet(m) {
@@ -25,6 +25,10 @@ class PJAnnotationDetailsViewController: PJBaseViewController, UIScrollViewDeleg
     private var photoContentView: UIView?
     private var addPhotoButton: UIButton?
     private var contentTextViewTipsLabel: UILabel?
+    private var backScrollView: UIScrollView?
+    private var newPhotoImage: UIImage?
+    
+    private var previousContentText: String?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -45,11 +49,11 @@ class PJAnnotationDetailsViewController: PJBaseViewController, UIScrollViewDeleg
     // MARK: -life cycle
     fileprivate func initView() {
         
-        let backScrollView = UIScrollView(frame: CGRect(x: 0, y: headerView!.bottom,
+        backScrollView = UIScrollView(frame: CGRect(x: 0, y: headerView!.bottom,
                                                         width: view.width, height: view.height))
-        backScrollView.delegate = self
-        backScrollView.showsVerticalScrollIndicator = false
-        view.addSubview(backScrollView)
+        backScrollView?.delegate = self
+        backScrollView?.showsVerticalScrollIndicator = false
+        view.addSubview(backScrollView!)
         
         
         locationLabel.frame = CGRect(x: 10, y: 0,
@@ -57,12 +61,12 @@ class PJAnnotationDetailsViewController: PJBaseViewController, UIScrollViewDeleg
         locationLabel.font = UIFont.boldSystemFont(ofSize: 22)
         locationLabel.textColor = .white
         locationLabel.numberOfLines = 2
-        backScrollView.addSubview(locationLabel)
+        backScrollView?.addSubview(locationLabel)
         
         
         let envImageView = UIImageView(frame: CGRect(x: 10, y: locationLabel.bottom + 20,
                                                      width:15    , height: 20))
-        backScrollView.addSubview(envImageView)
+        backScrollView?.addSubview(envImageView)
         envImageView.image = UIImage(named: "annotation_details_env")
         
         
@@ -70,12 +74,12 @@ class PJAnnotationDetailsViewController: PJBaseViewController, UIScrollViewDeleg
                                         width: view.width - 20, height: 20)
         environmentLabel.textColor = .white
         environmentLabel.font = UIFont.boldSystemFont(ofSize: 15)
-        backScrollView.addSubview(environmentLabel)
+        backScrollView?.addSubview(environmentLabel)
         
         
         let heaImageView = UIImageView(frame: CGRect(x: 10, y: envImageView.bottom + 10,
                                                      width: 17.5, height: 20))
-        backScrollView.addSubview(heaImageView)
+        backScrollView?.addSubview(heaImageView)
         heaImageView.image = UIImage(named: "annotation_details_altitude")
         
         
@@ -83,12 +87,12 @@ class PJAnnotationDetailsViewController: PJBaseViewController, UIScrollViewDeleg
                                    width: view.width - 20, height: 20)
         healthLabel.textColor = .white
         healthLabel.font = UIFont.boldSystemFont(ofSize: 15)
-        backScrollView.addSubview(healthLabel)
+        backScrollView?.addSubview(healthLabel)
         
         
         contentTextView = UITextView(frame: CGRect(x: 10, y: heaImageView.bottom + 30,
                                                    width: view.width - 20, height: 200))
-        backScrollView.addSubview(contentTextView!)
+        backScrollView?.addSubview(contentTextView!)
         contentTextView?.delegate = self
         contentTextView?.backgroundColor = PJRGB(r: 50, g: 50, b: 50)
         contentTextView?.tintColor = .white
@@ -107,13 +111,13 @@ class PJAnnotationDetailsViewController: PJBaseViewController, UIScrollViewDeleg
         
         photoContentView = UIView(frame: CGRect(x: contentTextView!.left, y: contentTextView!.bottom + 20, width: contentTextView!.width, height: 100))
         photoContentView?.backgroundColor = contentTextView?.backgroundColor
-        backScrollView.addSubview(photoContentView!)
-        backScrollView.layer.cornerRadius = 8
-        backScrollView.layer.masksToBounds = true
+        backScrollView?.addSubview(photoContentView!)
+        photoContentView?.layer.cornerRadius = 8
+        photoContentView?.layer.masksToBounds = true
         
         
         addPhotoButton = UIButton(frame: CGRect(x: 0, y: 0, width: 200, height: 80))
-        backScrollView.addSubview(addPhotoButton!)
+        backScrollView?.addSubview(addPhotoButton!)
         addPhotoButton?.addTarget(self, action: #selector(addPhotoButtonTapped), for: .touchUpInside)
         addPhotoButton?.center = photoContentView!.center
         addPhotoButton?.setTitleColor(.white, for: .normal)
@@ -122,7 +126,7 @@ class PJAnnotationDetailsViewController: PJBaseViewController, UIScrollViewDeleg
         
         
         
-        backScrollView.contentSize = CGSize(width: 0, height: view.height + 1)
+        backScrollView?.contentSize = CGSize(width: 0, height: view.height + 1)
     }
     
     
@@ -134,7 +138,14 @@ class PJAnnotationDetailsViewController: PJBaseViewController, UIScrollViewDeleg
         } else {
             contentTextViewTipsLabel?.isHidden = true
             contentTextView?.text = content
+            previousContentText = content
         }
+        
+        if let photoImage = PJCoreDataHelper.shared.annotationImage(model: annotationModel!) {
+            clipNewPhotoImage(photoImage)
+            newPhotoImage = photoImage
+        }
+        
     }
 
 
@@ -145,27 +156,43 @@ class PJAnnotationDetailsViewController: PJBaseViewController, UIScrollViewDeleg
     
     
     @objc private func rightButtonTapped() {
-        guard contentTextView?.text != "" else {
-            leftBarButtonTapped()
+        var isCanSave = 0
+        
+        if contentTextView?.text != "" {
+            isCanSave += 1
+        }
+        
+        if newPhotoImage != nil {
+            isCanSave += 1
+        }
+        
+        if  isCanSave < 1 {
+            print("签到内容和照片必须选一个哦～")
+            PJTapic.error()
             return
         }
+
         
         // TODO: - 做下提示
         let isSaved = PJCoreDataHelper.shared.addAnnotationContent(content: contentTextView!.text, model: annotationModel!)
-        if isSaved {
-            PJTapic.succee()
-            leftBarButtonTapped()
+    
+        if newPhotoImage != nil {
+            let isPhotoImage = PJCoreDataHelper.shared.addAnnotationPhoto(photoImage: newPhotoImage!,
+                                                                          model: annotationModel!)
+            if isPhotoImage && isSaved {
+                PJTapic.succee()
+                leftBarButtonTapped()
+            } else {
+                PJTapic.error()
+            }
         } else {
-            PJTapic.error()
+            if isSaved {
+                PJTapic.succee()
+                leftBarButtonTapped()
+            } else {
+                PJTapic.error()
+            }
         }
-    }
-    
-    
-    private func willSetModel(_ model: AnnotationModel) {
-        environmentLabel.text = model.environmentString
-        healthLabel.text = "海拔：" + model.altitude + "米  步数：" + model.stepCount
-        locationLabel.text = model.formatterAddress
-        
     }
     
     
@@ -175,11 +202,11 @@ class PJAnnotationDetailsViewController: PJBaseViewController, UIScrollViewDeleg
         let actionSheet = UIAlertController.init(title: "选择照片来源", message: "从相册选择或者相机拍摄一张照片吧～", preferredStyle: .actionSheet)
         
         let photoAlbumAction = UIAlertAction(title: "相册", style: .default) { (action) in
-            
+            self.initPhotoPicker()
         }
         
         let cameraAction = UIAlertAction(title: "相机", style: .default) { (action) in
-            
+            self.initCameraPicker()
         }
         
         let cancleAction = UIAlertAction(title: "取消", style: .cancel) { (action) in
@@ -192,6 +219,58 @@ class PJAnnotationDetailsViewController: PJBaseViewController, UIScrollViewDeleg
         
         present(actionSheet, animated: true)
         
+    }
+    
+    
+    private func initPhotoPicker() {
+        let photoPicker = UIImagePickerController()
+        photoPicker.delegate = self
+        photoPicker.sourceType = .photoLibrary
+        present(photoPicker, animated: true)
+    }
+    
+    
+    private func initCameraPicker() {
+        if UIImagePickerController.isSourceTypeAvailable(.camera) {
+            let cameraPicker = UIImagePickerController()
+            cameraPicker.delegate = self
+            cameraPicker.sourceType = .camera
+            present(cameraPicker, animated: true)
+        } else {
+            // TODO: 不支持拍照
+        }
+    }
+    
+    
+    @objc func image(image:UIImage,
+                     didFinishSavingWithError error:NSError?,
+                     contextInfo:AnyObject) {
+        if error != nil {
+            print("保存失败")
+        } else {
+            clipNewPhotoImage(image)
+            print("保存成功")
+        }
+    }
+    
+    
+    func clipNewPhotoImage(_ photoImage:UIImage) {
+        addPhotoButton?.isHidden = true
+        
+        let photoImageSize = photoImage.size
+        let radio = photoImageSize.width / photoImageSize.height
+        let photoImageView = UIImageView(frame: CGRect(x: 5, y: 5,
+                                                       width: photoContentView!.width - 10,
+                                                       height: photoContentView!.width / radio))
+        photoImageView.image = photoImage
+        photoContentView?.height = photoImageView.height + 10
+        photoImageView.layer.cornerRadius = 8
+        photoImageView.layer.masksToBounds = true
+        
+        newPhotoImage = photoImage
+        photoContentView?.addSubview(photoImageView)
+        backScrollView?.contentSize = CGSize(width: 0,
+                                             height: photoContentView!.bottom + 10 + headerView!.height)
     }
     
     
@@ -211,4 +290,26 @@ class PJAnnotationDetailsViewController: PJBaseViewController, UIScrollViewDeleg
         contentTextViewTipsLabel?.isHidden = true
     }
 
+    
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
+        let image: UIImage = info[UIImagePickerControllerOriginalImage] as! UIImage
+        if picker.sourceType == .camera {
+            UIImageWriteToSavedPhotosAlbum(image, self, #selector(image(image:didFinishSavingWithError:contextInfo:)), nil)
+        }
+        
+        if picker.sourceType == .photoLibrary {
+            clipNewPhotoImage(image)
+        }
+        
+        dismiss(animated: true, completion: nil)
+    }
+    
+    
+    // MARK: - setter & getter
+    private func willSetModel(_ model: AnnotationModel) {
+        environmentLabel.text = model.environmentString
+        healthLabel.text = "海拔：" + model.altitude + "米  步数：" + model.stepCount
+        locationLabel.text = model.formatterAddress
+        
+    }
 }

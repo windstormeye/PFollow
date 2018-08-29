@@ -153,4 +153,63 @@ class PJCoreDataHelper: NSObject {
         }
     }
     
+    
+    func addAnnotationPhoto(photoImage: UIImage, model: AnnotationModel) -> Bool {
+        
+        _ = deleteAnnotationImage(model: model)
+        
+        let annotationEntity = NSEntityDescription.insertNewObject(forEntityName: "AnnotationImage", into: context!) as! AnnotationImage
+        annotationEntity.image = UIImageJPEGRepresentation(photoImage, 1)
+        annotationEntity.longitude = model.longitude
+        annotationEntity.latitude = model.latitude
+        
+        do {
+            try context?.save()
+            print("保存成功")
+            return true
+        } catch {
+            print("不能保存：\(error)")
+            return false
+        }
+    }
+
+    
+    func annotationImage(model: AnnotationModel) -> UIImage? {
+        let fetchRequest = NSFetchRequest<AnnotationImage>(entityName:"AnnotationImage")
+        let contentPredicate = NSPredicate(format: "longitude=\(model.longitude) and latitude=\(model.latitude)")
+        fetchRequest.predicate = contentPredicate
+        do {
+            let fetchedObjects = try context?.fetch(fetchRequest)
+            print("查询成功")
+            if fetchedObjects?.first != nil {
+                return UIImage(data: fetchedObjects!.first!.image!)!
+            } else {
+                return nil
+            }
+        }
+        catch {
+            print("查询失败：\(error)")
+            return nil
+        }
+    }
+    
+    
+    func deleteAnnotationImage(model: AnnotationModel) -> Bool {
+        let fetchRequest = NSFetchRequest<AnnotationImage>(entityName:"AnnotationImage")
+        let contentPredicate = NSPredicate(format: "longitude=\(model.longitude) and latitude=\(model.latitude)")
+        fetchRequest.predicate = contentPredicate
+        do {
+            let fetchedObjects = try context?.fetch(fetchRequest)
+            for instance in fetchedObjects! {
+                context?.delete(instance)
+            }
+
+            print("查询成功")
+            return true
+        }
+        catch {
+            print("查询失败：\(error)")
+            return false
+        }
+    }
 }
