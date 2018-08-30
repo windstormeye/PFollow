@@ -9,7 +9,7 @@
 import UIKit
 import CoreMotion
 
-protocol PJMapViewDelete {
+ protocol PJMapViewDelete: class {
     func mapView(mapView: PJHomeMapView,
                  rotateDegree: CGFloat)
     func mapView(mapView: PJHomeMapView,
@@ -32,27 +32,28 @@ class PJHomeMapView: UIView, MAMapViewDelegate, AMapSearchDelegate, PJHomeMapAnn
 
     static let PJNotificationName_annotation = Notification.Name("PJNotificationName_annotation")
     
-    var viewDelegate: PJMapViewDelete?
+    weak var viewDelegate: PJMapViewDelete?
     var models = [AnnotationModel]()
     
     // 是否从 CoreData 中读取数据
     var isCache = false
     // 是否为新建标记点
     var isNewAnnotation = true
-    var isBigZoom = false
-    var isSmallZoom = false
+    
+    private var isBigZoom = false
+    private var isSmallZoom = false
+    private var notificationRecoder = 0
+    private var currentCacheAnnotationIndex = 0
+    
+    private var currentAnnotationModel: AnnotationModel?
+    private var currentAnnotation: MAAnnotation?
+    private var currentAnnotationView: PJHomeMapAnnotationView?
     
     private(set) var mapView: MAMapView = MAMapView()
-    
-    private var currentCacheAnnotationIndex = 0
     private var r = MAUserLocationRepresentation()
-    private var currentAnnotationModel: AnnotationModel?
-    private var currentrAnnotation: MAAnnotation?
     private var pedometer = CMPedometer()
-    
     private let search = AMapSearchAPI()
     private let req = AMapWeatherSearchRequest()
-    private var notificationRecoder = 0
     private var finalModelDict = [String: String]()
     
     
@@ -143,10 +144,12 @@ class PJHomeMapView: UIView, MAMapViewDelegate, AMapSearchDelegate, PJHomeMapAnn
                     if data != nil {
                         var json = json
                         json["stepCount"] = String(Int(truncating: (data?.numberOfSteps)!))
-                        if let json = try? JSONSerialization.data(withJSONObject: json, options: []) {
+                        if let json = try? JSONSerialization.data(withJSONObject: json,
+                                                                  options: []) {
                             if let annotationModel = try? JSONDecoder().decode(AnnotationModel.self,
                                                                                from: json) {
                                 DispatchQueue.main.async {
+                                    self.currentAnnotationView?.model = annotationModel
                                     self.viewDelegate?.mapView(mapView: self, isRequested: PJCoreDataHelper.shared.addAnnotation(model: annotationModel))
                                 }
                             }
@@ -197,7 +200,8 @@ class PJHomeMapView: UIView, MAMapViewDelegate, AMapSearchDelegate, PJHomeMapAnn
             // 该 tag 只是用于跟 userLocal 标记分开，不能唯一标识一个大头针
             annotationView?.tag = -2333
             
-            currentrAnnotation = annotation
+            currentAnnotation = annotation
+            currentAnnotationView = annotationView
             
             if isCache && !isNewAnnotation {
                 for model in models {
@@ -309,8 +313,8 @@ class PJHomeMapView: UIView, MAMapViewDelegate, AMapSearchDelegate, PJHomeMapAnn
             "createdTimeString": timeFormatter.string(from: Date()) as String,
             "weatherString": response.lives[0].weather,
             "environmentString": environmentString,
-            "latitude": String(Double((currentrAnnotation?.coordinate.latitude)!)),
-            "longitude": String(Double((currentrAnnotation?.coordinate.longitude)!)),
+            "latitude": String(Double((currentAnnotation?.coordinate.latitude)!)),
+            "longitude": String(Double((currentAnnotation?.coordinate.longitude)!)),
             "altitude": String(Int(mapView.userLocation.location.altitude))
             ]
         NotificationCenter.default.post(name: PJHomeMapView.PJNotificationName_annotation, object: nil, userInfo: params)

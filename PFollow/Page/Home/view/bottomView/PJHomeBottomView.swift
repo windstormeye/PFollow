@@ -8,14 +8,18 @@
 
 import UIKit
 
-@objc protocol PJHomeBottomViewDelegate {
-    @objc optional func homeBottomViewPlacesBtnClick(view: PJHomeBottomView)
-    @objc optional func homeBottomViewTapBtnClick(view: PJHomeBottomView, tapBtn: UIButton)
+protocol PJHomeBottomViewDelegate: class {
+    func homeBottomViewPlacesBtnClick(view: PJHomeBottomView)
+    func homeBottomViewTapBtnClick(view: PJHomeBottomView, tapBtn: UIButton)
+}
+extension PJHomeBottomViewDelegate {
+    func homeBottomViewPlacesBtnClick(view: PJHomeBottomView) {}
+    func homeBottomViewTapBtnClick(view: PJHomeBottomView, tapBtn: UIButton) {}
 }
 
 class PJHomeBottomView: UIView {
 
-    var viewDelegate: PJHomeBottomViewDelegate?
+    weak var viewDelegate: PJHomeBottomViewDelegate?
     var rotateDegree:CGFloat{
         set {
             self.compassImageView.transform = CGAffineTransform(rotationAngle: newValue * .pi / 180.0)
@@ -98,12 +102,12 @@ class PJHomeBottomView: UIView {
     // MARK: Action
     @objc private func tapBtnClick(sender: UIButton) {
         print("tap")
-        viewDelegate?.homeBottomViewTapBtnClick!(view: self, tapBtn: sender)
+        viewDelegate?.homeBottomViewTapBtnClick(view: self, tapBtn: sender)
     }
     
     @objc private func placesBtnClick() {
         print("places")
-        viewDelegate?.homeBottomViewPlacesBtnClick!(view: self)
+        viewDelegate?.homeBottomViewPlacesBtnClick(view: self)
     }
     
     @objc private func friendBtnClick() {

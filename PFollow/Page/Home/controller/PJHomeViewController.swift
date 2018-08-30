@@ -111,13 +111,13 @@ class PJHomeViewController: PJBaseViewController, PJHomeBottomViewDelegate, PJMa
     }
     
     
-    func mapView(_ mapView: PJHomeMapView, rotateDegree: CGFloat) {
+    func mapView(mapView: PJHomeMapView, rotateDegree: CGFloat) {
         // 调整指南针选择方向角度
         bottomView?.rotateDegree = (rotateDegree - 45)
     }
     
     
-    func mapView(_ mapView: PJHomeMapView, isRequested: Bool) {
+    func mapView(mapView: PJHomeMapView, isRequested: Bool) {
         // 如果失败要给 HUD 提示
         if isRequested {
             bottomView?.isRequest = !isRequested
