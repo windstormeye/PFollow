@@ -1,4 +1,4 @@
-//
+ //
 //  PJHomeMapView.swift
 //  PFollow
 //
@@ -9,11 +9,23 @@
 import UIKit
 import CoreMotion
 
-@objc protocol PJMapViewDelete {
-    @objc optional func mapView(_ mapView: PJHomeMapView, rotateDegree: CGFloat)
-    @objc optional func mapView(_ mapView: PJHomeMapView, isRequested: Bool)
-    @objc optional func mapViewInitComplate(_ mapView: PJHomeMapView)
-    @objc optional func mapViewTappedCalloutView(_ mapView: PJHomeMapView, annotationView: PJHomeMapAnnotationView)
+protocol PJMapViewDelete {
+    func mapView(mapView: PJHomeMapView,
+                 rotateDegree: CGFloat)
+    func mapView(mapView: PJHomeMapView,
+                 isRequested: Bool)
+    func mapViewInitComplate(_ mapView: PJHomeMapView)
+    func mapViewTappedCalloutView(_ mapView: PJHomeMapView,
+                                  annotationView: PJHomeMapAnnotationView)
+}
+extension PJMapViewDelete {
+    func mapView(mapView: PJHomeMapView,
+                 rotateDegree: CGFloat) {}
+    func mapView(mapView: PJHomeMapView,
+                 isRequested: Bool) {}
+    func mapViewInitComplate(_ mapView: PJHomeMapView) {}
+    func mapViewTappedCalloutView(_ mapView: PJHomeMapView,
+                                  annotationView: PJHomeMapAnnotationView) {}
 }
 
 class PJHomeMapView: UIView, MAMapViewDelegate, AMapSearchDelegate, PJHomeMapAnnotationViewDelegate {
@@ -22,13 +34,18 @@ class PJHomeMapView: UIView, MAMapViewDelegate, AMapSearchDelegate, PJHomeMapAnn
     
     var viewDelegate: PJMapViewDelete?
     var models = [AnnotationModel]()
-    var isCache: Bool = false
+    
+    // 是否从 CoreData 中读取数据
+    var isCache = false
+    // 是否为新建标记点
+    var isNewAnnotation = true
+    var isBigZoom = false
+    var isSmallZoom = false
     
     private(set) var mapView: MAMapView = MAMapView()
     
     private var currentCacheAnnotationIndex = 0
     private var r = MAUserLocationRepresentation()
-    private var currentCalloutView: PJHomeMapAnnotationView?
     private var currentAnnotationModel: AnnotationModel?
     private var currentrAnnotation: MAAnnotation?
     private var pedometer = CMPedometer()
@@ -93,18 +110,20 @@ class PJHomeMapView: UIView, MAMapViewDelegate, AMapSearchDelegate, PJHomeMapAnn
         if params["notifi_name"] == "city" {
             notificationRecoder += 1
             params.removeValue(forKey: "notifi_name")
-            finalModelDict.merge(params, uniquingKeysWith: { $1 })
+            finalModelDict.merge(params,
+                                 uniquingKeysWith: { $1 })
         }
         
         if params["notifi_name"] == "weather" {
             params.removeValue(forKey: "notifi_name")
             notificationRecoder += 1
-            finalModelDict.merge(params, uniquingKeysWith: { $1 })
+            finalModelDict.merge(params,
+                                 uniquingKeysWith: { $1 })
         }
         
         if notificationRecoder == 2 {
-            getPedonmeterData(json: finalModelDict)
             notificationRecoder = 0
+            getPedonmeterData(json: finalModelDict)
         }
         
     }
@@ -114,7 +133,8 @@ class PJHomeMapView: UIView, MAMapViewDelegate, AMapSearchDelegate, PJHomeMapAnn
         if CMPedometer.isStepCountingAvailable(){
             let calendar = Calendar.current
             let now = Date()
-            let components = calendar.dateComponents([.year, .month, .day], from: now)
+            let components = calendar.dateComponents([.year, .month, .day],
+                                                     from: now)
             let startDate = calendar.date(from: components)
             pedometer.queryPedometerData(from: startDate!, to: Date(), withHandler: { (data, error) in
                 if error != nil{
@@ -124,10 +144,10 @@ class PJHomeMapView: UIView, MAMapViewDelegate, AMapSearchDelegate, PJHomeMapAnn
                         var json = json
                         json["stepCount"] = String(Int(truncating: (data?.numberOfSteps)!))
                         if let json = try? JSONSerialization.data(withJSONObject: json, options: []) {
-                            if let annotationModel = try? JSONDecoder().decode(AnnotationModel.self, from: json) {
-                                self.currentCalloutView?.model = annotationModel
+                            if let annotationModel = try? JSONDecoder().decode(AnnotationModel.self,
+                                                                               from: json) {
                                 DispatchQueue.main.async {
-                                    self.viewDelegate?.mapView!(self, isRequested: PJCoreDataHelper.shared.addAnnotation(model: annotationModel))
+                                    self.viewDelegate?.mapView(mapView: self, isRequested: PJCoreDataHelper.shared.addAnnotation(model: annotationModel))
                                 }
                             }
                         }
@@ -149,7 +169,8 @@ class PJHomeMapView: UIView, MAMapViewDelegate, AMapSearchDelegate, PJHomeMapAnn
     }
     
     
-    func mapView(_ mapView: MAMapView!, viewFor annotation: MAAnnotation!) -> MAAnnotationView! {
+    func mapView(_ mapView: MAMapView!,
+                 viewFor annotation: MAAnnotation!) -> MAAnnotationView! {
         // 若为用户标签则 nil
         if annotation.isKind(of: MAUserLocation.self) {
             return nil
@@ -162,22 +183,26 @@ class PJHomeMapView: UIView, MAMapViewDelegate, AMapSearchDelegate, PJHomeMapAnn
             var annotationView = mapView.dequeueReusableAnnotationView(withIdentifier: annotationStyleReuseIndetifier) as! PJHomeMapAnnotationView?
             
             if annotationView == nil {
-                annotationView = PJHomeMapAnnotationView(annotation: annotation, reuseIdentifier: annotationStyleReuseIndetifier)
+                annotationView = PJHomeMapAnnotationView(annotation: annotation,
+                                                         reuseIdentifier: annotationStyleReuseIndetifier)
 
             }
-            annotationView?.image = UIImage(named: "home_map_makers_01_b")
+            if mapView.zoomLevel <=  12.8 {
+                annotationView?.image = UIImage(named: "home_map_makers_02")
+            } else {
+                annotationView?.image = UIImage(named: "home_map_makers_01_b")
+            }
             annotationView?.canShowCallout = false
             annotationView?.viewDelegate = self
             // 该 tag 只是用于跟 userLocal 标记分开，不能唯一标识一个大头针
-            annotationView?.tag = mapView.annotations.count + 1
+            annotationView?.tag = -2333
             
-            currentCalloutView = annotationView
             currentrAnnotation = annotation
             
-            if isCache {
+            if isCache && !isNewAnnotation {
                 for model in models {
-                    if Double(model.latitude) == annotationView?.annotation.coordinate.latitude &&
-                        Double(model.longitude) == annotationView?.annotation.coordinate.longitude {
+                    if Double(model.latitude) == annotation.coordinate.latitude &&
+                        Double(model.longitude) == annotation.coordinate.longitude {
                         annotationView?.model = model
                     }
                 }
@@ -185,9 +210,13 @@ class PJHomeMapView: UIView, MAMapViewDelegate, AMapSearchDelegate, PJHomeMapAnn
             }
             
             let request = AMapReGeocodeSearchRequest()
-            request.location = AMapGeoPoint.location(withLatitude: CGFloat(annotation.coordinate.latitude), longitude: CGFloat(annotation.coordinate.longitude))
+            request.location = AMapGeoPoint.location(withLatitude: CGFloat(annotation.coordinate.latitude),
+                                                     longitude: CGFloat(annotation.coordinate.longitude))
             request.requireExtension = true
             search?.aMapReGoecodeSearch(request)
+            
+            // 添加完新的标记点后，设置为 false
+            isNewAnnotation = false
             
             return annotationView
         }
@@ -197,12 +226,14 @@ class PJHomeMapView: UIView, MAMapViewDelegate, AMapSearchDelegate, PJHomeMapAnn
     
     
     // MARK:delegate
-    func homeMapAnnotationView(annotationView: PJHomeMapAnnotationView, shareAnnotaion: MAAnnotation) {
+    func homeMapAnnotationView(annotationView: PJHomeMapAnnotationView,
+                               shareAnnotaion: MAAnnotation) {
         
     }
     
     
-    func homeMapAnnotationView(annotationView: PJHomeMapAnnotationView, removeAnnotaion: MAAnnotation) {
+    func homeMapAnnotationView(annotationView: PJHomeMapAnnotationView,
+                               removeAnnotaion: MAAnnotation) {
         PJCoreDataHelper.shared.deleteAnnotation(model: annotationView.model!)
         
         UIView.animate(withDuration: 0.2, animations: {
@@ -234,13 +265,14 @@ class PJHomeMapView: UIView, MAMapViewDelegate, AMapSearchDelegate, PJHomeMapAnn
     
     
     func homeMapAnnotationViewTappedView(calloutView: PJHomeMapCalloutView, annotationView: PJHomeMapAnnotationView) {
-        viewDelegate?.mapViewTappedCalloutView!(self, annotationView: annotationView)
+        viewDelegate?.mapViewTappedCalloutView(self, annotationView: annotationView)
     }
     
     
     func mapView(_ mapView: MAMapView!, didUpdate userLocation: MAUserLocation!, updatingLocation: Bool) {
         if !updatingLocation {
-            viewDelegate?.mapView!(self, rotateDegree: CGFloat(userLocation.heading.trueHeading) - mapView.rotationDegree)
+            viewDelegate?.mapView(mapView: self,
+                                  rotateDegree: CGFloat(userLocation.heading.trueHeading) - mapView.rotationDegree)
         }
     }
     
@@ -285,12 +317,49 @@ class PJHomeMapView: UIView, MAMapViewDelegate, AMapSearchDelegate, PJHomeMapAnn
     }
     
     
+    func mapView(_ mapView: MAMapView!, mapDidZoomByUser wasUserAction: Bool) {
+        // TODO: 调整大头针样式
+        if mapView.zoomLevel < 12.8 {
+            if isSmallZoom == false {
+                let annotations = mapView.annotations
+                mapView.removeAnnotations(annotations)
+                
+                for model in models {
+                    let pointAnnotation = MAPointAnnotation()
+                    pointAnnotation.coordinate = CLLocationCoordinate2D(latitude: Double(model.latitude)!,
+                                                                        longitude: Double(model.longitude)!)
+                    mapView.addAnnotation(pointAnnotation)
+                }
+                
+                isSmallZoom = true
+                isBigZoom = false
+            }
+        } else {
+            if isBigZoom == false {
+                let annotations = mapView.annotations
+                mapView.removeAnnotations(annotations)
+                
+                for model in models {
+                    let pointAnnotation = MAPointAnnotation()
+                    pointAnnotation.coordinate = CLLocationCoordinate2D(latitude: Double(model.latitude)!,
+                                                                        longitude: Double(model.longitude)!)
+                    mapView.addAnnotation(pointAnnotation)
+                }
+                
+                isBigZoom = true
+                isSmallZoom = false
+            }
+        }
+    }
+    
+    
     func aMapSearchRequest(_ request: Any!, didFailWithError error: Error!) {
         print("Error:\(error)")
     }
     
     func mapInitComplete(_ mapView: MAMapView!) {
-        viewDelegate?.mapViewInitComplate!(self)
+        viewDelegate?.mapViewInitComplate(self)
     }
+    
     
 }

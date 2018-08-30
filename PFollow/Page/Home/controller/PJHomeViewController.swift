@@ -21,9 +21,6 @@ class PJHomeViewController: PJBaseViewController, PJHomeBottomViewDelegate, PJMa
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
-        // 视图载入完成后，设置地图缩放等级
-        mapView?.mapView.setZoomLevel(15, animated: true)
-        
         if bottomView?.tapBtn.alpha == 0 {
             UIView.animate(withDuration: 0.25) {
                 self.bottomView?.tapBtn.alpha = 1
@@ -45,6 +42,9 @@ class PJHomeViewController: PJBaseViewController, PJHomeBottomViewDelegate, PJMa
         bottomView = PJHomeBottomView.init(frame: CGRect(x: -PJSCREEN_WIDTH * 0.1, y: PJSCREEN_HEIGHT - 120, width: PJSCREEN_WIDTH * 1.2, height: 160))
         bottomView?.viewDelegate = self
         view.addSubview(bottomView!)
+        
+        // 视图载入完成后，设置地图缩放等级
+        mapView?.mapView.setZoomLevel(15, animated: true)
     }
     
     
@@ -86,7 +86,9 @@ class PJHomeViewController: PJBaseViewController, PJHomeBottomViewDelegate, PJMa
                                 }, completion: { (finished) in
                                     if finished {
                                         tempTapImageView.removeFromSuperview()
-                                        self.mapView?.isCache = false
+                                        
+                                        // 添加新的标记点
+                                        self.mapView?.isNewAnnotation = true
                                         
                                         let pointAnnotation = MAPointAnnotation()
                                         pointAnnotation.coordinate = (self.mapView?.mapView.userLocation.location.coordinate)!
@@ -128,7 +130,10 @@ class PJHomeViewController: PJBaseViewController, PJHomeBottomViewDelegate, PJMa
         let caches = PJCoreDataHelper.shared.allAnnotation()
         if caches.count != 0 {
             mapView.models = caches
+            // 从 CoreData 中读取数据
             mapView.isCache = true
+            // 不是新加入的标记点
+            mapView.isNewAnnotation = false
             for annotation in caches {
                 let pointAnnotation = MAPointAnnotation()
                 pointAnnotation.coordinate = CLLocationCoordinate2D.init(latitude: Double(annotation.latitude)!, longitude: Double(annotation.longitude)!)
