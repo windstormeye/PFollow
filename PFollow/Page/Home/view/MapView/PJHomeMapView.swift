@@ -322,33 +322,30 @@ class PJHomeMapView: UIView, MAMapViewDelegate, AMapSearchDelegate, PJHomeMapAnn
     
     
     func mapView(_ mapView: MAMapView!, mapDidZoomByUser wasUserAction: Bool) {
-        // TODO: 调整大头针样式
+        func changeAnnotation() {
+            let annotationSet = mapView.annotations(in: mapView.visibleMapRect).filter { (item) in
+                    !(item is MAUserLocation) } as! Set<MAPointAnnotation>
+            
+            mapView.removeAnnotations(Array(annotationSet))
+            
+            for annotation in annotationSet {
+                let pointAnnotation = MAPointAnnotation()
+                pointAnnotation.coordinate = CLLocationCoordinate2D(latitude: annotation.coordinate.latitude, longitude: annotation.coordinate.longitude)
+                mapView.addAnnotation(pointAnnotation)
+            }
+        }
+        
+        
         if mapView.zoomLevel < 12.8 {
             if isSmallZoom == false {
-                let annotations = mapView.annotations
-                mapView.removeAnnotations(annotations)
-                
-                for model in models {
-                    let pointAnnotation = MAPointAnnotation()
-                    pointAnnotation.coordinate = CLLocationCoordinate2D(latitude: Double(model.latitude)!,
-                                                                        longitude: Double(model.longitude)!)
-                    mapView.addAnnotation(pointAnnotation)
-                }
+                changeAnnotation()
                 
                 isSmallZoom = true
                 isBigZoom = false
             }
         } else {
             if isBigZoom == false {
-                let annotations = mapView.annotations
-                mapView.removeAnnotations(annotations)
-                
-                for model in models {
-                    let pointAnnotation = MAPointAnnotation()
-                    pointAnnotation.coordinate = CLLocationCoordinate2D(latitude: Double(model.latitude)!,
-                                                                        longitude: Double(model.longitude)!)
-                    mapView.addAnnotation(pointAnnotation)
-                }
+                changeAnnotation()
                 
                 isBigZoom = true
                 isSmallZoom = false
