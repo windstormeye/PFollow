@@ -44,6 +44,7 @@ class PJHomeMapView: UIView, MAMapViewDelegate, AMapSearchDelegate, PJHomeMapAnn
     private var isSmallZoom = false
     private var notificationRecoder = 0
     private var currentCacheAnnotationIndex = 0
+    private var mapViewAnnotationImageName = "home_map_makers_01_b"
     
     private var currentAnnotationModel: AnnotationModel?
     private var currentAnnotation: MAAnnotation?
@@ -55,6 +56,7 @@ class PJHomeMapView: UIView, MAMapViewDelegate, AMapSearchDelegate, PJHomeMapAnn
     private let search = AMapSearchAPI()
     private let req = AMapWeatherSearchRequest()
     private var finalModelDict = [String: String]()
+    private var annotationViews = [PJHomeMapAnnotationView]()
     
     
     // MARK: life cycle
@@ -188,13 +190,8 @@ class PJHomeMapView: UIView, MAMapViewDelegate, AMapSearchDelegate, PJHomeMapAnn
             if annotationView == nil {
                 annotationView = PJHomeMapAnnotationView(annotation: annotation,
                                                          reuseIdentifier: annotationStyleReuseIndetifier)
-
             }
-            if mapView.zoomLevel <=  12.8 {
-                annotationView?.image = UIImage(named: "home_map_makers_02")
-            } else {
-                annotationView?.image = UIImage(named: "home_map_makers_01_b")
-            }
+            annotationView?.image = UIImage(named: mapViewAnnotationImageName)
             annotationView?.canShowCallout = false
             annotationView?.viewDelegate = self
             // 该 tag 只是用于跟 userLocal 标记分开，不能唯一标识一个大头针
@@ -202,6 +199,8 @@ class PJHomeMapView: UIView, MAMapViewDelegate, AMapSearchDelegate, PJHomeMapAnn
             
             currentAnnotation = annotation
             currentAnnotationView = annotationView
+            
+            annotationViews.append(annotationView!)
             
             if isCache && !isNewAnnotation {
                 for model in models {
@@ -322,9 +321,10 @@ class PJHomeMapView: UIView, MAMapViewDelegate, AMapSearchDelegate, PJHomeMapAnn
     
     
     func mapView(_ mapView: MAMapView!, mapDidZoomByUser wasUserAction: Bool) {
+        
         func changeAnnotation() {
             let annotationSet = mapView.annotations(in: mapView.visibleMapRect).filter { (item) in
-                    !(item is MAUserLocation) } as! Set<MAPointAnnotation>
+                !(item is MAUserLocation) } as! Set<MAPointAnnotation>
             
             mapView.removeAnnotations(Array(annotationSet))
             
@@ -335,28 +335,62 @@ class PJHomeMapView: UIView, MAMapViewDelegate, AMapSearchDelegate, PJHomeMapAnn
             }
         }
         
-        
-        if mapView.zoomLevel < 12.8 {
+        if mapView.zoomLevel <= 12.8 {
             if isSmallZoom == false {
-                changeAnnotation()
-                
+                mapViewAnnotationImageName = "home_map_makers_02"
                 isSmallZoom = true
                 isBigZoom = false
+                
+                changeAnnotation()
             }
         } else {
             if isBigZoom == false {
-                changeAnnotation()
-                
+                mapViewAnnotationImageName = "home_map_makers_01_b"
                 isBigZoom = true
                 isSmallZoom = false
+                
+                changeAnnotation()
             }
         }
+    }
+    
+    
+    func mapView(_ mapView: MAMapView!, mapDidMoveByUser wasUserAction: Bool) {
+        guard annotationViews.count != 0 else {
+            return
+        }
+        
+        let annotationSet = mapView.annotations(in: mapView.visibleMapRect).filter { (item) in
+            !(item is MAUserLocation) } as! Set<MAPointAnnotation>
+        
+        for annotation in Array(annotationSet) {
+            for annotationView in annotationViews {
+                if annotation.coordinate.latitude == Double(annotationView.model!.latitude) &&
+                    annotation.coordinate.longitude == Double(annotationView.model!.longitude) {
+                    if mapView.zoomLevel < 12.8 {
+                        if annotationView.image == UIImage(named: "home_map_makers_01_b") {
+                            annotationView.image = UIImage(named: "home_map_makers_02")
+                        }
+                    } else {
+                        if annotationView.image == UIImage(named: "home_map_makers_02") {
+                            annotationView.image = UIImage(named: "home_map_makers_01_b")
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    
+    func mapView(_ mapView: MAMapView!, didLongPressedAt coordinate: CLLocationCoordinate2D) {
+        PJTapic.tap()
     }
     
     
     func aMapSearchRequest(_ request: Any!, didFailWithError error: Error!) {
         print("Error:\(error)")
     }
+    
     
     func mapInitComplete(_ mapView: MAMapView!) {
         viewDelegate?.mapViewInitComplate(self)
