@@ -14,6 +14,8 @@ import CoreMotion
                  rotateDegree: CGFloat)
     func mapView(mapView: PJHomeMapView,
                  isRequested: Bool)
+    func mapView(mapView: PJHomeMapView,
+                 didLongPressCoordinate: CLLocationCoordinate2D)
     func mapViewInitComplate(_ mapView: PJHomeMapView)
     func mapViewTappedCalloutView(_ mapView: PJHomeMapView,
                                   annotationView: PJHomeMapAnnotationView)
@@ -23,6 +25,8 @@ extension PJMapViewDelete {
                  rotateDegree: CGFloat) {}
     func mapView(mapView: PJHomeMapView,
                  isRequested: Bool) {}
+    func mapView(mapView: PJHomeMapView,
+                 didLongPressCoordinate: CLLocationCoordinate2D) {}
     func mapViewInitComplate(_ mapView: PJHomeMapView) {}
     func mapViewTappedCalloutView(_ mapView: PJHomeMapView,
                                   annotationView: PJHomeMapAnnotationView) {}
@@ -152,6 +156,8 @@ class PJHomeMapView: UIView, MAMapViewDelegate, AMapSearchDelegate, PJHomeMapAnn
                                                                                from: json) {
                                 DispatchQueue.main.async {
                                     self.currentAnnotationView?.model = annotationModel
+                                    self.annotationViews.append(self.currentAnnotationView!)
+                                    
                                     self.viewDelegate?.mapView(mapView: self, isRequested: PJCoreDataHelper.shared.addAnnotation(model: annotationModel))
                                 }
                             }
@@ -200,13 +206,13 @@ class PJHomeMapView: UIView, MAMapViewDelegate, AMapSearchDelegate, PJHomeMapAnn
             currentAnnotation = annotation
             currentAnnotationView = annotationView
             
-            annotationViews.append(annotationView!)
-            
             if isCache && !isNewAnnotation {
                 for model in models {
                     if Double(model.latitude) == annotation.coordinate.latitude &&
                         Double(model.longitude) == annotation.coordinate.longitude {
                         annotationView?.model = model
+                        annotationViews.append(annotationView!)
+                        break
                     }
                 }
                 return annotationView
@@ -256,6 +262,16 @@ class PJHomeMapView: UIView, MAMapViewDelegate, AMapSearchDelegate, PJHomeMapAnn
                                 }, completion: { (finished) in
                                     if finished {
                                         self.mapView.removeAnnotation(removeAnnotaion)
+                                        var index = 0
+                                        for annotation in self.annotationViews {
+                                            if Double(annotation.model!.latitude) == removeAnnotaion.coordinate.latitude &&
+                                                Double(annotation.model!.longitude) == removeAnnotaion.coordinate.longitude {
+                                                self.annotationViews.remove(at: index)
+                                                // 删除完毕要退出。😂
+                                                return
+                                            }
+                                            index += 1
+                                        }
                                     }
                                 })
                             }
@@ -383,7 +399,7 @@ class PJHomeMapView: UIView, MAMapViewDelegate, AMapSearchDelegate, PJHomeMapAnn
     
     
     func mapView(_ mapView: MAMapView!, didLongPressedAt coordinate: CLLocationCoordinate2D) {
-        PJTapic.tap()
+        viewDelegate?.mapView(mapView: self, didLongPressCoordinate: coordinate)
     }
     
     

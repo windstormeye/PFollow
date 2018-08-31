@@ -48,6 +48,17 @@ class PJHomeViewController: PJBaseViewController, PJHomeBottomViewDelegate, PJMa
     }
     
     
+    // MARK: - Action
+    private func addAnnotationViewToMapView(_ coordinate: CLLocationCoordinate2D) {
+        // 添加新的标记点
+        self.mapView?.isNewAnnotation = true
+        
+        let pointAnnotation = MAPointAnnotation()
+        pointAnnotation.coordinate = coordinate
+        self.mapView?.mapView.addAnnotation(pointAnnotation)
+    }
+    
+    
     // MARK: delegate
     func homeBottomViewPlacesBtnClick(view: PJHomeBottomView) {
         UIView.animate(withDuration: 0.25, animations: {
@@ -86,13 +97,7 @@ class PJHomeViewController: PJBaseViewController, PJHomeBottomViewDelegate, PJMa
                                 }, completion: { (finished) in
                                     if finished {
                                         tempTapImageView.removeFromSuperview()
-                                        
-                                        // 添加新的标记点
-                                        self.mapView?.isNewAnnotation = true
-                                        
-                                        let pointAnnotation = MAPointAnnotation()
-                                        pointAnnotation.coordinate = (self.mapView?.mapView.userLocation.location.coordinate)!
-                                        self.mapView?.mapView.addAnnotation(pointAnnotation)
+                                    self.addAnnotationViewToMapView((self.mapView?.mapView.userLocation.location.coordinate)!)
                                     }
                                 })
                             }
@@ -141,5 +146,10 @@ class PJHomeViewController: PJBaseViewController, PJHomeBottomViewDelegate, PJMa
                 mapView.mapView.addAnnotation(pointAnnotation)
             }
         }
+    }
+    
+    
+    func mapView(mapView: PJHomeMapView, didLongPressCoordinate: CLLocationCoordinate2D) {
+        addAnnotationViewToMapView(didLongPressCoordinate)
     }
 }
