@@ -143,7 +143,7 @@ class PJHomeMapView: UIView, MAMapViewDelegate, AMapSearchDelegate, PJHomeMapAnn
             isLongPress = false
             
             let longPressModel = AnnotationModel(weatherString: "-",
-                                                 createdTimeString: "还没有填写来过时间",
+                                                 createdTimeString: "还未填写来过时间",
                                                  environmentString: "-",
                                                  latitude: String(Double(currentAnnotation!.coordinate.latitude)),
                                                  longitude: String(Double(currentAnnotation!.coordinate.longitude)),
@@ -167,6 +167,7 @@ class PJHomeMapView: UIView, MAMapViewDelegate, AMapSearchDelegate, PJHomeMapAnn
         }
     }
     
+    
     private func getPedonmeterData(json: [String: String]) {
         pedometer = CMPedometer()
         if CMPedometer.isStepCountingAvailable(){
@@ -188,8 +189,14 @@ class PJHomeMapView: UIView, MAMapViewDelegate, AMapSearchDelegate, PJHomeMapAnn
                                                                                from: json) {
                                 DispatchQueue.main.async {
                                     self.currentAnnotationView?.model = annotationModel
-                                    self.currentAnnotationView?.image = UIImage(named: annotationModel.markerName)
                                     
+                                    if self.mapView.zoomLevel < 12.8 {
+                                        self.currentAnnotationView?.image = UIImage(named: annotationModel.markerName)
+                                    } else {
+                                        self.currentAnnotationView?.image = UIImage(named: annotationModel.markerName + "_b")
+                                    }
+                                    
+                                    self.models.append(annotationModel)
                                     // 添加新大头针
                                     let isRequest = self.addNewAnnotationView(annotationModel: annotationModel,
                                                                               annotationView: self.currentAnnotationView!)
@@ -361,7 +368,7 @@ class PJHomeMapView: UIView, MAMapViewDelegate, AMapSearchDelegate, PJHomeMapAnn
                 
                 "city": response.regeocode.addressComponent.city,
                 "formatterAddress": response.regeocode.formattedAddress,
-                "markerName": "home_map_makers_02",
+                "markerName": "home_map_makers_02", 
             ]
             NotificationCenter.default.post(name: PJHomeMapView.PJNotificationName_annotation,
                                             object: nil,
