@@ -28,4 +28,6 @@ struct AnnotationModel: Codable {
     var city: String
     // 格式化地址
     var formatterAddress: String
+    // 大头针图片名字
+    var markerName: String
 }

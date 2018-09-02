@@ -8,6 +8,7 @@
         <attribute name="formatterAddress" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="latitude" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="longitude" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="markerName" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="stepCount" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="weather" optional="YES" attributeType="String" syncable="YES"/>
         <relationship name="annotationToOneCity" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="AnnotationCity" inverseName="cityToManyAnnotation" inverseEntity="AnnotationCity" syncable="YES"/>
@@ -31,7 +32,7 @@
         <relationship name="imageToOneAnnotation" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Annotation" inverseName="annotationToOneImage" inverseEntity="Annotation" syncable="YES"/>
     </entity>
     <elements>
-        <element name="Annotation" positionX="-63" positionY="-18" width="128" height="225"/>
+        <element name="Annotation" positionX="-63" positionY="-18" width="128" height="240"/>
         <element name="AnnotationCity" positionX="-54" positionY="27" width="128" height="75"/>
         <element name="AnnotationContent" positionX="-45" positionY="54" width="128" height="105"/>
         <element name="AnnotationImage" positionX="-54" positionY="36" width="128" height="105"/>

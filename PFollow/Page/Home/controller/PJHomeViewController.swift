@@ -35,11 +35,16 @@ class PJHomeViewController: PJBaseViewController, PJHomeBottomViewDelegate, PJMa
     
     // MARK: life cycle
     private func initView() {
-        mapView = PJHomeMapView.init(frame: CGRect(x: 0, y: 0, width: PJSCREEN_WIDTH, height: PJSCREEN_HEIGHT))
+        mapView = PJHomeMapView.init(frame: CGRect(x: 0, y: 0,
+                                                   width: PJSCREEN_WIDTH,
+                                                   height: PJSCREEN_HEIGHT))
         mapView?.viewDelegate = self
         view.addSubview(mapView!)
         
-        bottomView = PJHomeBottomView.init(frame: CGRect(x: -PJSCREEN_WIDTH * 0.1, y: PJSCREEN_HEIGHT - 120, width: PJSCREEN_WIDTH * 1.2, height: 160))
+        bottomView = PJHomeBottomView.init(frame: CGRect(x: -PJSCREEN_WIDTH * 0.1,
+                                                         y: PJSCREEN_HEIGHT - 120,
+                                                         width: PJSCREEN_WIDTH * 1.2,
+                                                         height: 160))
         bottomView?.viewDelegate = self
         view.addSubview(bottomView!)
         
@@ -49,10 +54,11 @@ class PJHomeViewController: PJBaseViewController, PJHomeBottomViewDelegate, PJMa
     
     
     // MARK: - Action
-    private func addAnnotationViewToMapView(_ coordinate: CLLocationCoordinate2D) {
+    private func addAnnotationViewToMapView(_ coordinate: CLLocationCoordinate2D,
+                                            isLongPress: Bool) {
         // 添加新的标记点
         self.mapView?.isNewAnnotation = true
-        
+
         let pointAnnotation = MAPointAnnotation()
         pointAnnotation.coordinate = coordinate
         self.mapView?.mapView.addAnnotation(pointAnnotation)
@@ -97,7 +103,8 @@ class PJHomeViewController: PJBaseViewController, PJHomeBottomViewDelegate, PJMa
                                 }, completion: { (finished) in
                                     if finished {
                                         tempTapImageView.removeFromSuperview()
-                                    self.addAnnotationViewToMapView((self.mapView?.mapView.userLocation.location.coordinate)!)
+                                    self.addAnnotationViewToMapView((self.mapView?.mapView.userLocation.location.coordinate)!,
+                                                                    isLongPress: false)
                                     }
                                 })
                             }
@@ -150,6 +157,7 @@ class PJHomeViewController: PJBaseViewController, PJHomeBottomViewDelegate, PJMa
     
     
     func mapView(mapView: PJHomeMapView, didLongPressCoordinate: CLLocationCoordinate2D) {
-        addAnnotationViewToMapView(didLongPressCoordinate)
+        PJTapic.tap()
+        addAnnotationViewToMapView(didLongPressCoordinate, isLongPress: true)
     }
 }

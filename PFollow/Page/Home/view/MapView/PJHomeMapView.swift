@@ -43,23 +43,27 @@ class PJHomeMapView: UIView, MAMapViewDelegate, AMapSearchDelegate, PJHomeMapAnn
     var isCache = false
     // 是否为新建标记点
     var isNewAnnotation = true
+    // 是否为用户长按添加的标记点
+    private var isLongPress = false
     
     private var isBigZoom = false
     private var isSmallZoom = false
     private var notificationRecoder = 0
     private var currentCacheAnnotationIndex = 0
-    private var mapViewAnnotationImageName = "home_map_makers_01_b"
     
-    private var currentAnnotationModel: AnnotationModel?
     private var currentAnnotation: MAAnnotation?
+    private var currentAnnotationModel: AnnotationModel?
     private var currentAnnotationView: PJHomeMapAnnotationView?
     
     private(set) var mapView: MAMapView = MAMapView()
+    
     private var r = MAUserLocationRepresentation()
     private var pedometer = CMPedometer()
     private let search = AMapSearchAPI()
     private let req = AMapWeatherSearchRequest()
+    // 查询完环境和天气后的最终字典
     private var finalModelDict = [String: String]()
+    // 地图上的当前所有大头针
     private var annotationViews = [PJHomeMapAnnotationView]()
     
     
@@ -133,6 +137,34 @@ class PJHomeMapView: UIView, MAMapViewDelegate, AMapSearchDelegate, PJHomeMapAnn
             getPedonmeterData(json: finalModelDict)
         }
         
+        
+        if isLongPress {
+            notificationRecoder = 0
+            isLongPress = false
+            
+            let longPressModel = AnnotationModel(weatherString: "-",
+                                                 createdTimeString: "还没有填写来过时间",
+                                                 environmentString: "-",
+                                                 latitude: String(Double(currentAnnotation!.coordinate.latitude)),
+                                                 longitude: String(Double(currentAnnotation!.coordinate.longitude)),
+                                                 altitude: "-",
+                                                 stepCount: "-",
+                                                 city: finalModelDict["city"]!,
+                                                 formatterAddress: finalModelDict["formatterAddress"]!,
+                                                 markerName: "home_map_makers_03")
+            
+            currentAnnotationView?.model = longPressModel
+            // models 为 controller 传入，更新 annotationView 时需要用到它，所以当在 mapview 内部添加新 model 时，需要更新 models
+            models.append(longPressModel)
+            
+            if mapView.zoomLevel < 12.8 {
+                currentAnnotationView?.image = UIImage(named: longPressModel.markerName)
+            } else {
+                currentAnnotationView?.image = UIImage(named: longPressModel.markerName + "_b")
+            }
+            let _ = addNewAnnotationView(annotationModel: longPressModel,
+                                 annotationView: currentAnnotationView!)
+        }
     }
     
     private func getPedonmeterData(json: [String: String]) {
@@ -156,9 +188,13 @@ class PJHomeMapView: UIView, MAMapViewDelegate, AMapSearchDelegate, PJHomeMapAnn
                                                                                from: json) {
                                 DispatchQueue.main.async {
                                     self.currentAnnotationView?.model = annotationModel
-                                    self.annotationViews.append(self.currentAnnotationView!)
+                                    self.currentAnnotationView?.image = UIImage(named: annotationModel.markerName)
                                     
-                                    self.viewDelegate?.mapView(mapView: self, isRequested: PJCoreDataHelper.shared.addAnnotation(model: annotationModel))
+                                    // 添加新大头针
+                                    let isRequest = self.addNewAnnotationView(annotationModel: annotationModel,
+                                                                              annotationView: self.currentAnnotationView!)
+                                    self.viewDelegate?.mapView(mapView: self,
+                                                               isRequested: isRequest)
                                 }
                             }
                         }
@@ -197,7 +233,6 @@ class PJHomeMapView: UIView, MAMapViewDelegate, AMapSearchDelegate, PJHomeMapAnn
                 annotationView = PJHomeMapAnnotationView(annotation: annotation,
                                                          reuseIdentifier: annotationStyleReuseIndetifier)
             }
-            annotationView?.image = UIImage(named: mapViewAnnotationImageName)
             annotationView?.canShowCallout = false
             annotationView?.viewDelegate = self
             // 该 tag 只是用于跟 userLocal 标记分开，不能唯一标识一个大头针
@@ -208,9 +243,15 @@ class PJHomeMapView: UIView, MAMapViewDelegate, AMapSearchDelegate, PJHomeMapAnn
             
             if isCache && !isNewAnnotation {
                 for model in models {
-                    if Double(model.latitude) == annotation.coordinate.latitude &&
-                        Double(model.longitude) == annotation.coordinate.longitude {
+                    if model.latitude == String(Double(annotation.coordinate.latitude)) &&
+                        model.longitude == String(Double(annotation.coordinate.longitude)) {
                         annotationView?.model = model
+                        if mapView.zoomLevel < 12.8 {
+                            annotationView?.image = UIImage(named: model.markerName)
+                        } else {
+                            annotationView?.image = UIImage(named: model.markerName + "_b")
+                        }
+                
                         annotationViews.append(annotationView!)
                         break
                     }
@@ -218,6 +259,7 @@ class PJHomeMapView: UIView, MAMapViewDelegate, AMapSearchDelegate, PJHomeMapAnn
                 return annotationView
             }
             
+            // 请求环境数据
             let request = AMapReGeocodeSearchRequest()
             request.location = AMapGeoPoint.location(withLatitude: CGFloat(annotation.coordinate.latitude),
                                                      longitude: CGFloat(annotation.coordinate.longitude))
@@ -226,11 +268,18 @@ class PJHomeMapView: UIView, MAMapViewDelegate, AMapSearchDelegate, PJHomeMapAnn
             
             // 添加完新的标记点后，设置为 false
             isNewAnnotation = false
-            
             return annotationView
         }
         
         return nil
+    }
+    
+    
+    func addNewAnnotationView(annotationModel: AnnotationModel,
+                              annotationView: PJHomeMapAnnotationView) -> Bool {
+        self.annotationViews.append(annotationView)
+        let isSaved = PJCoreDataHelper.shared.addAnnotation(model: annotationModel)
+        return isSaved
     }
     
     
@@ -267,7 +316,7 @@ class PJHomeMapView: UIView, MAMapViewDelegate, AMapSearchDelegate, PJHomeMapAnn
                                             if Double(annotation.model!.latitude) == removeAnnotaion.coordinate.latitude &&
                                                 Double(annotation.model!.longitude) == removeAnnotaion.coordinate.longitude {
                                                 self.annotationViews.remove(at: index)
-                                                // 删除完毕要退出。😂
+                                                // 删除完要退出。😂
                                                 return
                                             }
                                             index += 1
@@ -283,12 +332,14 @@ class PJHomeMapView: UIView, MAMapViewDelegate, AMapSearchDelegate, PJHomeMapAnn
     }
     
     
-    func homeMapAnnotationViewTappedView(calloutView: PJHomeMapCalloutView, annotationView: PJHomeMapAnnotationView) {
+    func homeMapAnnotationViewTappedView(calloutView: PJHomeMapCalloutView,
+                                         annotationView: PJHomeMapAnnotationView) {
         viewDelegate?.mapViewTappedCalloutView(self, annotationView: annotationView)
     }
     
     
-    func mapView(_ mapView: MAMapView!, didUpdate userLocation: MAUserLocation!, updatingLocation: Bool) {
+    func mapView(_ mapView: MAMapView!, didUpdate userLocation: MAUserLocation!,
+                 updatingLocation: Bool) {
         if !updatingLocation {
             viewDelegate?.mapView(mapView: self,
                                   rotateDegree: CGFloat(userLocation.heading.trueHeading) - mapView.rotationDegree)
@@ -296,18 +347,25 @@ class PJHomeMapView: UIView, MAMapViewDelegate, AMapSearchDelegate, PJHomeMapAnn
     }
     
     
-    func onReGeocodeSearchDone(_ request: AMapReGeocodeSearchRequest!, response: AMapReGeocodeSearchResponse!) {
+    func onReGeocodeSearchDone(_ request: AMapReGeocodeSearchRequest!,
+                               response: AMapReGeocodeSearchResponse!) {
         if response.regeocode != nil {
-            req.city = response.regeocode.addressComponent.city
-            search?.aMapWeatherSearch(req)
+            // 请求天气数据，如果是长按添加的大头针则不请求
+            if !isLongPress {
+                req.city = response.regeocode.addressComponent.city
+                search?.aMapWeatherSearch(req)
+            }
             
             let params: [String: String] = [
                 "notifi_name": "city",
                 
                 "city": response.regeocode.addressComponent.city,
-                "formatterAddress": response.regeocode.formattedAddress
+                "formatterAddress": response.regeocode.formattedAddress,
+                "markerName": "home_map_makers_02",
             ]
-            NotificationCenter.default.post(name: PJHomeMapView.PJNotificationName_annotation, object: nil, userInfo: params)
+            NotificationCenter.default.post(name: PJHomeMapView.PJNotificationName_annotation,
+                                            object: nil,
+                                            userInfo: params)
             
             print(response.regeocode.addressComponent.city)
             print(response.regeocode.addressComponent.citycode)
@@ -315,8 +373,12 @@ class PJHomeMapView: UIView, MAMapViewDelegate, AMapSearchDelegate, PJHomeMapAnn
     }
     
     
-    func onWeatherSearchDone(_ request: AMapWeatherSearchRequest!, response: AMapWeatherSearchResponse!) {
-        let environmentString = response.lives[0].temperature + "° " + response.lives[0].windDirection + "风" + response.lives[0].windPower + "级 " + response.lives[0].humidity + "%rh"
+    func onWeatherSearchDone(_ request: AMapWeatherSearchRequest!,
+                             response: AMapWeatherSearchResponse!) {
+        let environmentString = response.lives[0].temperature + "° " +
+            response.lives[0].windDirection + "风" +
+            response.lives[0].windPower + "级 " +
+            response.lives[0].humidity + "%rh"
         
         let timeFormatter = DateFormatter()
         timeFormatter.dateFormat = "yyyy-MM-dd"
@@ -325,14 +387,16 @@ class PJHomeMapView: UIView, MAMapViewDelegate, AMapSearchDelegate, PJHomeMapAnn
         let params: [String: String] = [
             "notifi_name": "weather",
             
-            "createdTimeString": timeFormatter.string(from: Date()) as String,
+            "createdTimeString": timeFormatter.string(from: Date()) as String + " 来过",
             "weatherString": response.lives[0].weather,
             "environmentString": environmentString,
             "latitude": String(Double((currentAnnotation?.coordinate.latitude)!)),
             "longitude": String(Double((currentAnnotation?.coordinate.longitude)!)),
             "altitude": String(Int(mapView.userLocation.location.altitude))
             ]
-        NotificationCenter.default.post(name: PJHomeMapView.PJNotificationName_annotation, object: nil, userInfo: params)
+        NotificationCenter.default.post(name: PJHomeMapView.PJNotificationName_annotation,
+                                        object: nil,
+                                        userInfo: params)
     }
     
     
@@ -346,14 +410,14 @@ class PJHomeMapView: UIView, MAMapViewDelegate, AMapSearchDelegate, PJHomeMapAnn
             
             for annotation in annotationSet {
                 let pointAnnotation = MAPointAnnotation()
-                pointAnnotation.coordinate = CLLocationCoordinate2D(latitude: annotation.coordinate.latitude, longitude: annotation.coordinate.longitude)
+                pointAnnotation.coordinate = CLLocationCoordinate2D(latitude: annotation.coordinate.latitude,
+                                                                    longitude: annotation.coordinate.longitude)
                 mapView.addAnnotation(pointAnnotation)
             }
         }
         
         if mapView.zoomLevel <= 12.8 {
             if isSmallZoom == false {
-                mapViewAnnotationImageName = "home_map_makers_02"
                 isSmallZoom = true
                 isBigZoom = false
                 
@@ -361,7 +425,6 @@ class PJHomeMapView: UIView, MAMapViewDelegate, AMapSearchDelegate, PJHomeMapAnn
             }
         } else {
             if isBigZoom == false {
-                mapViewAnnotationImageName = "home_map_makers_01_b"
                 isBigZoom = true
                 isSmallZoom = false
                 
@@ -384,13 +447,9 @@ class PJHomeMapView: UIView, MAMapViewDelegate, AMapSearchDelegate, PJHomeMapAnn
                 if annotation.coordinate.latitude == Double(annotationView.model!.latitude) &&
                     annotation.coordinate.longitude == Double(annotationView.model!.longitude) {
                     if mapView.zoomLevel < 12.8 {
-                        if annotationView.image == UIImage(named: "home_map_makers_01_b") {
-                            annotationView.image = UIImage(named: "home_map_makers_02")
-                        }
+                        annotationView.image = UIImage(named: annotationView.model!.markerName)
                     } else {
-                        if annotationView.image == UIImage(named: "home_map_makers_02") {
-                            annotationView.image = UIImage(named: "home_map_makers_01_b")
-                        }
+                        annotationView.image = UIImage(named: annotationView.model!.markerName + "_b")
                     }
                 }
             }
@@ -399,6 +458,7 @@ class PJHomeMapView: UIView, MAMapViewDelegate, AMapSearchDelegate, PJHomeMapAnn
     
     
     func mapView(_ mapView: MAMapView!, didLongPressedAt coordinate: CLLocationCoordinate2D) {
+        isLongPress = true
         viewDelegate?.mapView(mapView: self, didLongPressCoordinate: coordinate)
     }
     

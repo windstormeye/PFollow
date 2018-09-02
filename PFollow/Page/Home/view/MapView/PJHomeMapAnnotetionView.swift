@@ -18,6 +18,7 @@ class PJHomeMapAnnotationView: MAAnnotationView, PJHomeMapCalloutViewDelegate, C
     
     var viewDelegate: PJHomeMapAnnotationViewDelegate?
     var model: AnnotationModel?
+
     
     private var calloutView: PJHomeMapCalloutView?
     private var kCalloutWidth = 180.0
@@ -49,7 +50,10 @@ class PJHomeMapAnnotationView: MAAnnotationView, PJHomeMapCalloutViewDelegate, C
             calloutView?.viewDelegate = self
             calloutView?.y += 20
             calloutView?.alpha = 0
-            calloutView?.model = model
+            
+            if model != nil {
+                calloutView?.model = model
+            }
             
             UIView.animateKeyframes(withDuration: 0.15, delay: 0, options: .calculationModeCubic, animations: {
                 self.calloutView?.alpha = 1.0
