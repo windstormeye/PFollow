@@ -1,16 +1,18 @@
 PODS:
-  - AMap3DMap (6.2.0):
+  - AMap3DMap (6.4.0):
     - AMapFoundation (~> 1.5)
-  - AMapFoundation (1.5.2)
-  - AMapLocation (2.6.0):
+  - AMapFoundation (1.5.4)
+  - AMapLocation (2.6.1):
     - AMapFoundation (~> 1.4)
   - AMapSearch (6.1.1):
     - AMapFoundation (~> 1.4)
+  - IQKeyboardManagerSwift (6.1.1)
 
 DEPENDENCIES:
   - AMap3DMap
   - AMapLocation
   - AMapSearch
+  - IQKeyboardManagerSwift
 
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
@@ -18,13 +20,15 @@ SPEC REPOS:
     - AMapFoundation
     - AMapLocation
     - AMapSearch
+    - IQKeyboardManagerSwift
 
 SPEC CHECKSUMS:
-  AMap3DMap: 4170b8e1674883eefc068e277abf4dbaa9ea5f2d
-  AMapFoundation: 46b194013a3b06e0e82e8963108ceb972d4200b8
-  AMapLocation: 55116a2c8956eab7550cbb56e989aa5cdcc424e3
+  AMap3DMap: ebfb4e202c2bee9c3a6c296264e29f12436b6379
+  AMapFoundation: bff8688722e886feda4edd77f1443746ddd7e2e2
+  AMapLocation: cf024b53dc03663efb4ea4bcce27d4cce58bb97a
   AMapSearch: 3dcbf85c403a2a0fe0eda5318caabc272b31f5e1
+  IQKeyboardManagerSwift: 977affaeb4d6e971975c7790a6850f31d38f1207
 
-PODFILE CHECKSUM: 256aee78f24049fc5bf82e5ddcac5e25809cb8a7
+PODFILE CHECKSUM: 42e422b93ab7b425d3310d1f4c1b4d08e8e5d24e
 
 COCOAPODS: 1.5.3

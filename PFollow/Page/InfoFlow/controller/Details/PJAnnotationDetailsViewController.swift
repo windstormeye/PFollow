@@ -10,23 +10,24 @@ import UIKit
 
 class PJAnnotationDetailsViewController: PJBaseViewController, UIScrollViewDelegate, UITextViewDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
 
-    var annotationModel: AnnotationModel? {
-        willSet(m) {
-            willSetModel(m!)
-        }
-    }
+    var annotationModel: AnnotationModel?
     
     
-    private var environmentLabel = UILabel()
-    private var healthLabel = UILabel()
-    private var locationLabel = UILabel()
-    
+    private var environmentLabel: UILabel?
+    private var healthLabel: UILabel?
+    private var locationLabel: UILabel?
+    private var envImageView: UIImageView?
+    private var heaImageView: UIImageView?
     private var contentTextView: UITextView?
+    private var addTimeButton: UIButton?
+    
     private var photoContentView: UIView?
     private var addPhotoButton: UIButton?
     private var contentTextViewTipsLabel: UILabel?
     private var backScrollView: UIScrollView?
     private var newPhotoImage: UIImage?
+    
+    private var contentTextViewLeftPadding: CGFloat?
     
     private var previousContentText: String?
     
@@ -56,42 +57,42 @@ class PJAnnotationDetailsViewController: PJBaseViewController, UIScrollViewDeleg
         view.addSubview(backScrollView!)
         
         
-        locationLabel.frame = CGRect(x: 10, y: 0,
-                                     width: view.width - 20, height: navBarHeigt!)
-        locationLabel.font = UIFont.boldSystemFont(ofSize: 22)
-        locationLabel.textColor = .white
-        locationLabel.numberOfLines = 2
-        backScrollView?.addSubview(locationLabel)
+        locationLabel = UILabel(frame: CGRect(x: 10, y: 0,
+                                              width: view.width - 20, height: navBarHeigt!))
+        locationLabel?.font = UIFont.boldSystemFont(ofSize: 22)
+        locationLabel?.textColor = .white
+        locationLabel?.numberOfLines = 2
+        backScrollView?.addSubview(locationLabel!)
         
         
-        let envImageView = UIImageView(frame: CGRect(x: 10, y: locationLabel.bottom + 20,
-                                                     width:15    , height: 20))
-        backScrollView?.addSubview(envImageView)
-        envImageView.image = UIImage(named: "annotation_details_env")
+        envImageView = UIImageView(frame: CGRect(x: 10, y: locationLabel!.bottom + 20,
+                                                 width:15, height: 20))
+        backScrollView?.addSubview(envImageView!)
+        envImageView?.image = UIImage(named: "annotation_details_env")
         
         
-        environmentLabel.frame = CGRect(x: 35, y: envImageView.top,
-                                        width: view.width - 20, height: 20)
-        environmentLabel.textColor = .white
-        environmentLabel.font = UIFont.boldSystemFont(ofSize: 15)
-        backScrollView?.addSubview(environmentLabel)
+        environmentLabel = UILabel(frame: CGRect(x: 35, y: envImageView!.top,
+                                                 width: view.width - 20, height: 20))
+        environmentLabel?.textColor = .white
+        environmentLabel?.font = UIFont.boldSystemFont(ofSize: 15)
+        backScrollView?.addSubview(environmentLabel!)
         
         
-        let heaImageView = UIImageView(frame: CGRect(x: 10, y: envImageView.bottom + 10,
-                                                     width: 17.5, height: 20))
-        backScrollView?.addSubview(heaImageView)
-        heaImageView.image = UIImage(named: "annotation_details_altitude")
+        heaImageView = UIImageView(frame: CGRect(x: 10, y: envImageView!.bottom + 10,
+                                                 width: 17.5, height: 20))
+        backScrollView?.addSubview(heaImageView!)
+        heaImageView?.image = UIImage(named: "annotation_details_altitude")
         
         
-        healthLabel.frame = CGRect(x: 35, y: heaImageView.top,
-                                   width: view.width - 20, height: 20)
-        healthLabel.textColor = .white
-        healthLabel.font = UIFont.boldSystemFont(ofSize: 15)
-        backScrollView?.addSubview(healthLabel)
+        healthLabel = UILabel(frame: CGRect(x: 35, y: heaImageView!.top,
+                                            width: view.width - 20, height: 20))
+        healthLabel?.textColor = .white
+        healthLabel?.font = UIFont.boldSystemFont(ofSize: 15)
+        backScrollView?.addSubview(healthLabel!)
         
         
-        contentTextView = UITextView(frame: CGRect(x: 10, y: heaImageView.bottom + 30,
-                                                   width: view.width - 20, height: 200))
+        contentTextView = UITextView(frame: CGRect(x: 10, y: heaImageView!.bottom + 30,
+                                               width: view.width - 20, height: 200))
         backScrollView?.addSubview(contentTextView!)
         contentTextView?.delegate = self
         contentTextView?.backgroundColor = PJRGB(r: 50, g: 50, b: 50)
@@ -102,43 +103,68 @@ class PJAnnotationDetailsViewController: PJBaseViewController, UIScrollViewDeleg
         contentTextView?.layer.masksToBounds = true
         
         
+        contentTextViewLeftPadding = contentTextView!.textContainer.lineFragmentPadding
+        
+        
         contentTextViewTipsLabel = UILabel(frame: CGRect(x: 5, y: 10,
                                                          width: contentTextView!.width, height: 20))
         contentTextView?.addSubview(contentTextViewTipsLabel!)
-        contentTextViewTipsLabel?.font = contentTextView?.font
-        contentTextViewTipsLabel?.textColor = contentTextView?.textColor
+        contentTextViewTipsLabel?.font = contentTextView!.font
+        contentTextViewTipsLabel?.textColor = contentTextView!.textColor
         
         
-        photoContentView = UIView(frame: CGRect(x: contentTextView!.left, y: contentTextView!.bottom + 20, width: contentTextView!.width, height: 100))
-        photoContentView?.backgroundColor = contentTextView?.backgroundColor
+        photoContentView = UIView(frame: CGRect(x: contentTextView!.left,
+                                                y: contentTextView!.bottom + 20,
+                                                width: contentTextView!.width,
+                                                height: 100))
+        photoContentView?.backgroundColor = contentTextView!.backgroundColor
         backScrollView?.addSubview(photoContentView!)
         photoContentView?.layer.cornerRadius = 8
         photoContentView?.layer.masksToBounds = true
         
         
-        addPhotoButton = UIButton(frame: CGRect(x: 0, y: 0, width: 200, height: 80))
-        backScrollView?.addSubview(addPhotoButton!)
-        addPhotoButton?.addTarget(self, action: #selector(addPhotoButtonTapped), for: .touchUpInside)
-        addPhotoButton?.center = photoContentView!.center
+        addPhotoButton = UIButton(frame: CGRect(x: 0, y: 0,
+                                                width: 200, height: 80))
+        photoContentView?.addSubview(addPhotoButton!)
+        addPhotoButton?.addTarget(self,
+                                  action: #selector(addPhotoButtonTapped),
+                                  for: .touchUpInside)
+        addPhotoButton?.centerX = view.centerX - 10
+        addPhotoButton?.top = (photoContentView!.height - 80) / 2
         addPhotoButton?.setTitleColor(.white, for: .normal)
         addPhotoButton?.titleLabel?.font = UIFont.systemFont(ofSize: 15)
         addPhotoButton?.setTitle("点击添加照片", for: .normal)
         
         
+        addTimeButton = UIButton(frame: CGRect(x: photoContentView!.right - 30,
+                                               y: photoContentView!.bottom - headerView!.height - PJStatusHeight,
+                                               width: 30, height: 30))
+        backScrollView?.addSubview(addTimeButton!)
+        addTimeButton?.addTarget(self,
+                                 action: #selector(showSelectTimeList),
+                                 for: .touchUpInside)
+        addTimeButton?.setImage(UIImage(named: "annotation_details_addTime"),
+                                for: .normal)
         
-        backScrollView?.contentSize = CGSize(width: 0, height: view.height + 1)
     }
     
-    
     private func initData() {
+        title = annotationModel?.createdTimeString
+        locationLabel?.text = annotationModel?.formatterAddress
+        
+        // MARK: coreData
         let content = PJCoreDataHelper.shared.annotationContent(model: annotationModel!)
         if content == "" {
             contentTextViewTipsLabel?.isHidden = false
             contentTextViewTipsLabel?.text = "快来填写签到内容吧～"
+            
+            updateBackScrollViewContentSize()
         } else {
             contentTextViewTipsLabel?.isHidden = true
             contentTextView?.text = content
             previousContentText = content
+            
+            updateView(showTips: false)
         }
         
         if let photoImage = PJCoreDataHelper.shared.annotationImage(model: annotationModel!) {
@@ -146,10 +172,30 @@ class PJAnnotationDetailsViewController: PJBaseViewController, UIScrollViewDeleg
             newPhotoImage = photoImage
         }
         
+        // MARK: update frame
+        if annotationModel?.environmentString == "-" {
+            environmentLabel?.isHidden = true
+            healthLabel?.isHidden = true
+            envImageView?.isHidden = true
+            heaImageView?.isHidden = true
+            
+            contentTextView?.top = locationLabel!.bottom + 10
+            photoContentView?.top = contentTextView!.bottom + 10
+        } else {
+            addTimeButton?.isHidden = true
+
+            environmentLabel?.text = annotationModel?.environmentString
+            healthLabel?.text = "海拔：" + annotationModel!.altitude + "米  步数：" + annotationModel!.stepCount
+        }
     }
 
 
     // MARK: - Action
+    @objc private func showSelectTimeList() {
+        print("showTime")
+    }
+    
+    
     @objc private func leftBarButtonTapped() {
         navigationController?.popViewController(animated: true)
     }
@@ -173,7 +219,7 @@ class PJAnnotationDetailsViewController: PJBaseViewController, UIScrollViewDeleg
         }
 
         
-        // TODO: - 做下提示
+        // TODO: 做下提示
         let isSaved = PJCoreDataHelper.shared.addAnnotationContent(content: contentTextView!.text, model: annotationModel!)
     
         if newPhotoImage != nil {
@@ -254,6 +300,22 @@ class PJAnnotationDetailsViewController: PJBaseViewController, UIScrollViewDeleg
     }
     
     
+    private func updateBackScrollViewContentSize() {
+        if annotationModel!.createdTimeString.contains("/") {
+            backScrollView?.contentSize = CGSize(width: 0,
+                                                 height: photoContentView!.bottom + 10 + headerView!.height)
+        } else {
+            backScrollView?.contentSize = CGSize(width: 0,
+                                                 height: addTimeButton!.bottom + 10 + headerView!.height)
+        }
+        
+        if backScrollView!.contentSize.height < view.height {
+            backScrollView?.contentSize = CGSize(width: 0,
+                                                 height: view.height + 1)
+        }
+    }
+    
+    
     func clipNewPhotoImage(_ photoImage:UIImage) {
         addPhotoButton?.isHidden = true
         
@@ -269,29 +331,73 @@ class PJAnnotationDetailsViewController: PJBaseViewController, UIScrollViewDeleg
         
         newPhotoImage = photoImage
         photoContentView?.addSubview(photoImageView)
-        backScrollView?.contentSize = CGSize(width: 0,
-                                             height: photoContentView!.bottom + 10 + headerView!.height)
+        
+        updateBackScrollViewContentSize()
+    }
+    
+    
+    private func updateView(showTips: Bool) {
+        if showTips {
+            UIView.animate(withDuration: 0.25, animations: {
+                self.contentTextView?.height = 200
+            }) { (finished) in
+                if finished {
+                    UIView.animate(withDuration: 0.25, animations: {
+                        self.photoContentView?.top = self.contentTextView!.bottom + 20
+                        self.addTimeButton?.top = self.photoContentView!.bottom + 10
+                    }, completion: { (finished) in
+                        if finished {
+                            PJTapic.tap()
+                            
+                            self.updateBackScrollViewContentSize()
+                        }
+                    })
+                }
+            }
+        } else {
+            let textSize = contentTextView!.attributedText.boundingRect(with: CGSize(width: contentTextView!.width - 2 * contentTextViewLeftPadding!, height: CGFloat(MAXFLOAT)), options: NSStringDrawingOptions.usesLineFragmentOrigin, context: nil)
+            
+            UIView.animate(withDuration: 0.25, animations: {
+                self.contentTextView?.height = textSize.size.height + self.contentTextViewLeftPadding! * 3.5
+            }) { (finished) in
+                if finished {
+                    UIView.animate(withDuration: 0.25, animations: {
+                        self.photoContentView?.top = self.contentTextView!.bottom + 20
+                        self.addTimeButton?.top = self.photoContentView!.bottom + 10
+                    }, completion: { (finished) in
+                        if finished {
+                            PJTapic.tap()
+                            
+                            self.updateBackScrollViewContentSize()
+                        }
+                    })
+                }
+            }
+        }
     }
     
     
     // MARK: - Delegate
-    func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        if contentTextView!.isFirstResponder {
-            contentTextView?.resignFirstResponder()
+    func textViewDidEndEditing(_ textView: UITextView) {
+        guard textView.text != "" else {
+            return
         }
+        updateView(showTips: false)
     }
     
     
     func textViewDidChange(_ textView: UITextView) {
         guard textView.text != "" else {
             contentTextViewTipsLabel?.isHidden = false
+            updateView(showTips: true)
             return
         }
         contentTextViewTipsLabel?.isHidden = true
     }
 
     
-    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
+    func imagePickerController(_ picker: UIImagePickerController,
+                               didFinishPickingMediaWithInfo info: [String : Any]) {
         let image: UIImage = info[UIImagePickerControllerOriginalImage] as! UIImage
         if picker.sourceType == .camera {
             UIImageWriteToSavedPhotosAlbum(image, self, #selector(image(image:didFinishSavingWithError:contextInfo:)), nil)
@@ -302,14 +408,5 @@ class PJAnnotationDetailsViewController: PJBaseViewController, UIScrollViewDeleg
         }
         
         dismiss(animated: true, completion: nil)
-    }
-    
-    
-    // MARK: - setter & getter
-    private func willSetModel(_ model: AnnotationModel) {
-        environmentLabel.text = model.environmentString
-        healthLabel.text = "海拔：" + model.altitude + "米  步数：" + model.stepCount
-        locationLabel.text = model.formatterAddress
-        
     }
 }

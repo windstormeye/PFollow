@@ -126,7 +126,14 @@ class PJHomeMapCalloutView: UIView {
     
     // MARK: setter and getter
     private func willSetModel(_ model: AnnotationModel) {
-        titleLabel.text = model.createdTimeString
+        if model.createdTimeString.contains("/") {
+            let startIndex = model.createdTimeString.startIndex
+            let endIndex = model.createdTimeString.index(startIndex, offsetBy: 10)
+            titleLabel.text = String(model.createdTimeString[startIndex...endIndex]) + " 来过"
+        } else {
+            titleLabel.text = model.createdTimeString
+        }
+        
         weatherImageView.image = UIImage(named: model.weatherString)
         temperatureLabel.text = model.environmentString
         temperatureLabel.sizeToFit()

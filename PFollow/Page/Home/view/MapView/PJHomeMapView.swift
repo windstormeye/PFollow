@@ -390,7 +390,7 @@ class PJHomeMapView: UIView, MAMapViewDelegate, AMapSearchDelegate, PJHomeMapAnn
             response.lives[0].humidity + "%rh"
         
         let timeFormatter = DateFormatter()
-        timeFormatter.dateFormat = "yyyy-MM-dd"
+        timeFormatter.dateFormat = "yyyy/MM/dd HH:mm"
         
         
         let params: [String: String] = [
