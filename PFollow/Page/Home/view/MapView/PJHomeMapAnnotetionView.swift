@@ -18,7 +18,6 @@ class PJHomeMapAnnotationView: MAAnnotationView, PJHomeMapCalloutViewDelegate, C
     
     var viewDelegate: PJHomeMapAnnotationViewDelegate?
     var model: AnnotationModel?
-
     
     private var calloutView: PJHomeMapCalloutView?
     private var kCalloutWidth = 180.0

@@ -65,6 +65,8 @@ class PJHomeMapView: UIView, MAMapViewDelegate, AMapSearchDelegate, PJHomeMapAnn
     private var finalModelDict = [String: String]()
     // 地图上的当前所有大头针
     private var annotationViews = [PJHomeMapAnnotationView]()
+    private var biggerAnnotationViews = [PJHomeMapAnnotationView]()
+    private var smallAnnotationViews = [PJHomeMapAnnotationView]()
     
     
     // MARK: life cycle
@@ -368,7 +370,7 @@ class PJHomeMapView: UIView, MAMapViewDelegate, AMapSearchDelegate, PJHomeMapAnn
                 
                 "city": response.regeocode.addressComponent.city,
                 "formatterAddress": response.regeocode.formattedAddress,
-                "markerName": "home_map_makers_02", 
+                "markerName": "home_map_makers_02",
             ]
             NotificationCenter.default.post(name: PJHomeMapView.PJNotificationName_annotation,
                                             object: nil,
@@ -446,19 +448,25 @@ class PJHomeMapView: UIView, MAMapViewDelegate, AMapSearchDelegate, PJHomeMapAnn
             return
         }
         
-        let annotationSet = mapView.annotations(in: mapView.visibleMapRect).filter { (item) in
-            !(item is MAUserLocation) } as! Set<MAPointAnnotation>
+        let annotationArray = Array(mapView.annotations(in: mapView.visibleMapRect).filter { (item) in
+            !(item is MAUserLocation) } as! Set<MAPointAnnotation>)
         
-        for annotation in Array(annotationSet) {
-            for annotationView in annotationViews {
-                if annotation.coordinate.latitude == Double(annotationView.model!.latitude) &&
-                    annotation.coordinate.longitude == Double(annotationView.model!.longitude) {
-                    if mapView.zoomLevel < 12.8 {
-                        annotationView.image = UIImage(named: annotationView.model!.markerName)
-                    } else {
-                        annotationView.image = UIImage(named: annotationView.model!.markerName + "_b")
-                    }
+        let screenAnntationView = annotationViews.filter { (item) in
+            for annotation in annotationArray {
+                if annotation.coordinate.latitude == Double(item.model!.latitude) &&
+                    annotation.coordinate.longitude == Double(item.model!.longitude) {
+                    return true
                 }
+            }
+            return false
+        }
+
+
+        for annotationView in screenAnntationView {
+            if mapView.zoomLevel < 12.8 {
+                annotationView.image = UIImage(named: annotationView.model!.markerName)
+            } else {
+                annotationView.image = UIImage(named: annotationView.model!.markerName + "_b")
             }
         }
     }
