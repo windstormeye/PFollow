@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14113" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14088"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" id="iN0-l3-epB" customClass="PJDatePickerView" customModule="PFollow" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="375" height="200"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <datePicker contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" datePickerMode="date" minuteInterval="1" translatesAutoresizingMaskIntoConstraints="NO" id="jFW-EV-5ty">
+                    <rect key="frame" x="0.0" y="38" width="375" height="162"/>
+                    <date key="date" timeIntervalSinceReferenceDate="557721902.83721805">
+                        <!--2018-09-04 02:45:02 +0000-->
+                    </date>
+                    <locale key="locale" localeIdentifier="zh_CN"/>
+                </datePicker>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="pSZ-eZ-EAW">
+                    <rect key="frame" x="343" y="10" width="22" height="22"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="22" id="eVj-gU-E8u"/>
+                        <constraint firstAttribute="width" constant="22" id="rfZ-Ve-qj1"/>
+                    </constraints>
+                    <state key="normal" image="home_tap_ok"/>
+                    <connections>
+                        <action selector="okButtonTapped:" destination="iN0-l3-epB" eventType="touchUpInside" id="4OY-ku-CFo"/>
+                    </connections>
+                </button>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="选择您曾经来过的时间" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="k8Y-Jc-NU3">
+                    <rect key="frame" x="116" y="13.5" width="143" height="15"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="15" id="QAN-Ni-kDw"/>
+                    </constraints>
+                    <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                    <nil key="textColor"/>
+                    <nil key="highlightedColor"/>
+                </label>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="I30-rG-yu5">
+                    <rect key="frame" x="10" y="10" width="13" height="22"/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="13" id="Axn-Nf-RsT"/>
+                        <constraint firstAttribute="height" constant="22" id="EBk-9m-Jxg"/>
+                    </constraints>
+                    <state key="normal" image="callout_delete"/>
+                    <connections>
+                        <action selector="closeButtonTapped:" destination="iN0-l3-epB" eventType="touchUpInside" id="7Db-Hj-2Jy"/>
+                    </connections>
+                </button>
+            </subviews>
+            <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <constraints>
+                <constraint firstItem="pSZ-eZ-EAW" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" constant="10" id="0gn-fO-FIQ"/>
+                <constraint firstItem="k8Y-Jc-NU3" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" id="3hS-gp-vp8"/>
+                <constraint firstItem="vUN-kp-3ea" firstAttribute="trailing" secondItem="pSZ-eZ-EAW" secondAttribute="trailing" constant="10" id="V1z-ok-2JJ"/>
+                <constraint firstItem="I30-rG-yu5" firstAttribute="top" secondItem="vUN-kp-3ea" secondAttribute="top" constant="10" id="Vos-jK-pj2"/>
+                <constraint firstItem="jFW-EV-5ty" firstAttribute="trailing" secondItem="vUN-kp-3ea" secondAttribute="trailing" id="ceb-l9-hio"/>
+                <constraint firstItem="k8Y-Jc-NU3" firstAttribute="centerY" secondItem="I30-rG-yu5" secondAttribute="centerY" id="iPr-vW-vZg"/>
+                <constraint firstItem="jFW-EV-5ty" firstAttribute="bottom" secondItem="vUN-kp-3ea" secondAttribute="bottom" id="jjE-P5-gaw"/>
+                <constraint firstItem="I30-rG-yu5" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" constant="10" id="k86-3c-HEF"/>
+                <constraint firstItem="jFW-EV-5ty" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" id="qMP-kh-37s"/>
+            </constraints>
+            <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+            <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>
+            <connections>
+                <outlet property="closeButton" destination="I30-rG-yu5" id="cw0-EB-gTy"/>
+                <outlet property="datePickerView" destination="jFW-EV-5ty" id="Tyn-gr-fL0"/>
+                <outlet property="okButton" destination="pSZ-eZ-EAW" id="bAr-Wg-Hmu"/>
+            </connections>
+        </view>
+    </objects>
+    <resources>
+        <image name="callout_delete" width="13" height="13"/>
+        <image name="home_tap_ok" width="39" height="39"/>
+    </resources>
+</document>

@@ -8,10 +8,9 @@
 
 import UIKit
 
-class PJAnnotationDetailsViewController: PJBaseViewController, UIScrollViewDelegate, UITextViewDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+class PJAnnotationDetailsViewController: PJBaseViewController, UIScrollViewDelegate, UITextViewDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate, PJDatePickerViewDelegate {
 
-    var annotationModel: AnnotationModel?
-    
+    var annotationView: PJHomeMapAnnotationView?
     
     private var environmentLabel: UILabel?
     private var healthLabel: UILabel?
@@ -30,6 +29,7 @@ class PJAnnotationDetailsViewController: PJBaseViewController, UIScrollViewDeleg
     private var contentTextViewLeftPadding: CGFloat?
     
     private var previousContentText: String?
+    private var updateTimeString: String?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -149,11 +149,11 @@ class PJAnnotationDetailsViewController: PJBaseViewController, UIScrollViewDeleg
     }
     
     private func initData() {
-        title = annotationModel?.createdTimeString
-        locationLabel?.text = annotationModel?.formatterAddress
+        title = annotationView?.model?.createdTimeString
+        locationLabel?.text = annotationView?.model?.formatterAddress
         
         // MARK: coreData
-        let content = PJCoreDataHelper.shared.annotationContent(model: annotationModel!)
+        let content = PJCoreDataHelper.shared.annotationContent(model: annotationView!.model!)
         if content == "" {
             contentTextViewTipsLabel?.isHidden = false
             contentTextViewTipsLabel?.text = "快来填写签到内容吧～"
@@ -167,13 +167,13 @@ class PJAnnotationDetailsViewController: PJBaseViewController, UIScrollViewDeleg
             updateView(showTips: false)
         }
         
-        if let photoImage = PJCoreDataHelper.shared.annotationImage(model: annotationModel!) {
+        if let photoImage = PJCoreDataHelper.shared.annotationImage(model: annotationView!.model!) {
             clipNewPhotoImage(photoImage)
             newPhotoImage = photoImage
         }
         
         // MARK: update frame
-        if annotationModel?.environmentString == "-" {
+        if annotationView?.model?.environmentString == "-" {
             environmentLabel?.isHidden = true
             healthLabel?.isHidden = true
             envImageView?.isHidden = true
@@ -184,19 +184,32 @@ class PJAnnotationDetailsViewController: PJBaseViewController, UIScrollViewDeleg
         } else {
             addTimeButton?.isHidden = true
 
-            environmentLabel?.text = annotationModel?.environmentString
-            healthLabel?.text = "海拔：" + annotationModel!.altitude + "米  步数：" + annotationModel!.stepCount
+            environmentLabel?.text = annotationView?.model?.environmentString
+            healthLabel?.text = "海拔：" + annotationView!.model!.altitude + "米  步数：" + annotationView!.model!.stepCount
         }
     }
 
 
     // MARK: - Action
     @objc private func showSelectTimeList() {
-        print("showTime")
+        datePickerView.isHidden = false
+        UIView.animate(withDuration: 0.25, animations: {
+            self.datePickerView.bottom = self.view.height
+        }) { (finished) in
+            PJTapic.tap()
+        }
     }
     
     
     @objc private func leftBarButtonTapped() {
+        if title!.contains("/") {
+            annotationView?.model?.createdTimeString = title!
+            NotificationCenter.default.post(name: NSNotification.Name(rawValue: PJNotificationName_updateCallouView),
+                                            object: nil,
+                                            userInfo: [
+                                                "time": title!,
+                                                ])
+        }
         navigationController?.popViewController(animated: true)
     }
     
@@ -219,25 +232,32 @@ class PJAnnotationDetailsViewController: PJBaseViewController, UIScrollViewDeleg
         }
 
         
+        var isUpdateTime = true
+        var isSaved = true
+        var isPhotoImage = true
+        
+        
         // TODO: 做下提示
-        let isSaved = PJCoreDataHelper.shared.addAnnotationContent(content: contentTextView!.text, model: annotationModel!)
+        if title!.contains("/") {
+            let formatString = "longitude=\(annotationView!.model!.longitude) and latitude=\(annotationView!.model!.latitude)"
+            isUpdateTime = PJCoreDataHelper.shared.updateAnnotation(formatString: formatString, updateTime: title!)
+        }
+        
+        
+        
+        isSaved = PJCoreDataHelper.shared.addAnnotationContent(content: contentTextView!.text, model: annotationView!.model!)
     
         if newPhotoImage != nil {
-            let isPhotoImage = PJCoreDataHelper.shared.addAnnotationPhoto(photoImage: newPhotoImage!,
-                                                                          model: annotationModel!)
-            if isPhotoImage && isSaved {
-                PJTapic.succee()
-                leftBarButtonTapped()
-            } else {
-                PJTapic.error()
-            }
+            isPhotoImage = PJCoreDataHelper.shared.addAnnotationPhoto(photoImage: newPhotoImage!,
+                                                                          model: annotationView!.model!)
+        }
+        
+        
+        if isPhotoImage && isSaved && isUpdateTime {
+            PJTapic.succee()
+            leftBarButtonTapped()
         } else {
-            if isSaved {
-                PJTapic.succee()
-                leftBarButtonTapped()
-            } else {
-                PJTapic.error()
-            }
+            PJTapic.error()
         }
     }
     
@@ -301,7 +321,7 @@ class PJAnnotationDetailsViewController: PJBaseViewController, UIScrollViewDeleg
     
     
     private func updateBackScrollViewContentSize() {
-        if annotationModel!.createdTimeString.contains("/") {
+        if annotationView!.model!.createdTimeString.contains("/") {
             backScrollView?.contentSize = CGSize(width: 0,
                                                  height: photoContentView!.bottom + 10 + headerView!.height)
         } else {
@@ -377,6 +397,25 @@ class PJAnnotationDetailsViewController: PJBaseViewController, UIScrollViewDeleg
     }
     
     
+    func changeDatePickerViewStuts() {
+        if datePickerView.bottom == view.height {
+            UIView.animate(withDuration: 0.25,
+                           delay: 0,
+                           options: .curveEaseOut,
+                           animations: {
+                            self.datePickerView.top = self.view.height
+            }, completion: nil)
+        } else {
+            UIView.animate(withDuration: 0.25,
+                           delay: 0,
+                           options: .curveEaseIn,
+                           animations: {
+                            self.datePickerView.bottom = self.view.height
+            }, completion: nil)
+        }
+    }
+    
+    
     // MARK: - Delegate
     func textViewDidEndEditing(_ textView: UITextView) {
         guard textView.text != "" else {
@@ -409,4 +448,29 @@ class PJAnnotationDetailsViewController: PJBaseViewController, UIScrollViewDeleg
         
         dismiss(animated: true, completion: nil)
     }
+    
+    
+    func PJDatePickerViewOkButtonTapped(_ dateString: String) {
+        changeDatePickerViewStuts()
+        title = dateString
+    }
+    
+    
+    func PJDatePickerViewCloseButtonTapped() {
+        changeDatePickerViewStuts()
+    }
+    
+    
+    // MARK: lazy load {
+    lazy var datePickerView: PJDatePickerView = {
+        let datePickerView = PJDatePickerView.newInstance()
+        datePickerView?.height = 250
+        datePickerView?.isHidden = true
+        datePickerView?.top = view.height
+        datePickerView?.viewDelegate = self
+        PJInsertRoundingCorners(datePickerView!)
+        
+        view.addSubview(datePickerView!)
+        return datePickerView!
+    }()
 }

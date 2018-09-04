@@ -118,7 +118,7 @@ class PJHomeViewController: PJBaseViewController, PJHomeBottomViewDelegate, PJMa
     
     func mapViewTappedCalloutView(_ mapView: PJHomeMapView, annotationView: PJHomeMapAnnotationView) {
         let vc = PJAnnotationDetailsViewController()
-        vc.annotationModel = annotationView.model
+        vc.annotationView = annotationView
         navigationController?.pushViewController(vc, animated: true)
     }
     
@@ -146,11 +146,13 @@ class PJHomeViewController: PJBaseViewController, PJHomeBottomViewDelegate, PJMa
             mapView.isCache = true
             // 不是新加入的标记点
             mapView.isNewAnnotation = false
+            var index = 0
             for annotation in caches {
                 let pointAnnotation = MAPointAnnotation()
                 pointAnnotation.coordinate = CLLocationCoordinate2D.init(latitude: Double(annotation.latitude)!, longitude: Double(annotation.longitude)!)
-                
                 mapView.mapView.addAnnotation(pointAnnotation)
+                
+                index += 1
             }
         }
     }

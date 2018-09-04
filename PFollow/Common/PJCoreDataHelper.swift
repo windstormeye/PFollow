@@ -83,6 +83,28 @@ class PJCoreDataHelper: NSObject {
     }
     
     
+    func updateAnnotation(formatString: String, updateTime: String) -> Bool {
+        let fetchRequest = NSFetchRequest<Annotation>(entityName:"Annotation")
+        let predict = NSPredicate(format: formatString, argumentArray: nil)
+        fetchRequest.predicate = predict
+        do {
+            let annotation = try context?.fetch(fetchRequest)[0]
+            annotation?.created_time = updateTime
+            do {
+                try context?.save()
+                print("保存成功")
+                return true
+            } catch {
+                print("不能保存：\(error)")
+                return false
+            }
+        } catch {
+            print("查询成功")
+            return false
+        }
+    }
+    
+    
     func deleteAnnotation(model: AnnotationModel) {
         let fetchRequest = NSFetchRequest<Annotation>(entityName:"Annotation")
         let coordinate = NSPredicate(format: "longitude=\(model.longitude) and latitude=\(model.latitude)")

@@ -23,6 +23,12 @@ class PJHomeMapCalloutView: UIView {
         }
     }
     
+    var titleString: String = "" {
+        willSet(s) {
+            willSetTitleString(s)
+        }
+    }
+    
     private(set) var shareBtn       = UIButton()
     private(set) var deleteBtn      = UIButton()
     private var weatherImageView    = UIImageView()
@@ -86,6 +92,11 @@ class PJHomeMapCalloutView: UIView {
     
     @objc private func calloutViewTapped() {
         viewDelegate?.homeMapCalloutTapped!(callout: self)
+    }
+    
+    
+    private func willSetTitleString(_ s: String) {
+        titleLabel.text = s
     }
     
     

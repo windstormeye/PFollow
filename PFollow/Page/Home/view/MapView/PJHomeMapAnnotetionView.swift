@@ -26,6 +26,11 @@ class PJHomeMapAnnotationView: MAAnnotationView, PJHomeMapCalloutViewDelegate, C
     
     override init!(annotation: MAAnnotation!, reuseIdentifier: String!) {
         super.init(annotation: annotation, reuseIdentifier: reuseIdentifier)
+        
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(updateCalloutView),
+                                               name: NSNotification.Name(rawValue: PJNotificationName_updateCallouView),
+                                               object: nil)
     }
     
     
@@ -109,6 +114,13 @@ class PJHomeMapAnnotationView: MAAnnotationView, PJHomeMapCalloutViewDelegate, C
             
             self.layer.add(growAnimation, forKey: "growAnimation")
         }
+    }
+    
+    
+    // MARK: Notification
+    @objc private func updateCalloutView(notifi: Notification) {
+        let timeString = notifi.userInfo!["time"] as! String
+        calloutView?.titleString = timeString
     }
     
     
