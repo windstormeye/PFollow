@@ -152,6 +152,17 @@ class PJAnnotationDetailsViewController: PJBaseViewController, UIScrollViewDeleg
         title = annotationView?.model?.createdTimeString
         locationLabel?.text = annotationView?.model?.formatterAddress
         
+        if annotationView!.model!.createdTimeString.contains("/") {
+            addTimeButton?.isHidden = true
+        } else {
+            addTimeButton?.isHidden = false
+        }
+        
+        if let photoImage = PJCoreDataHelper.shared.annotationImage(model: annotationView!.model!) {
+            clipNewPhotoImage(photoImage)
+            newPhotoImage = photoImage
+        }
+        
         // MARK: coreData
         let content = PJCoreDataHelper.shared.annotationContent(model: annotationView!.model!)
         if content == "" {
@@ -167,11 +178,6 @@ class PJAnnotationDetailsViewController: PJBaseViewController, UIScrollViewDeleg
             updateView(showTips: false)
         }
         
-        if let photoImage = PJCoreDataHelper.shared.annotationImage(model: annotationView!.model!) {
-            clipNewPhotoImage(photoImage)
-            newPhotoImage = photoImage
-        }
-        
         // MARK: update frame
         if annotationView?.model?.environmentString == "-" {
             environmentLabel?.isHidden = true
@@ -182,8 +188,6 @@ class PJAnnotationDetailsViewController: PJBaseViewController, UIScrollViewDeleg
             contentTextView?.top = locationLabel!.bottom + 10
             photoContentView?.top = contentTextView!.bottom + 10
         } else {
-            addTimeButton?.isHidden = true
-
             environmentLabel?.text = annotationView?.model?.environmentString
             healthLabel?.text = "海拔：" + annotationView!.model!.altitude + "米  步数：" + annotationView!.model!.stepCount
         }
@@ -352,6 +356,8 @@ class PJAnnotationDetailsViewController: PJBaseViewController, UIScrollViewDeleg
         newPhotoImage = photoImage
         photoContentView?.addSubview(photoImageView)
         
+        addTimeButton?.top = photoContentView!.bottom + 10
+        
         updateBackScrollViewContentSize()
     }
     
@@ -461,7 +467,7 @@ class PJAnnotationDetailsViewController: PJBaseViewController, UIScrollViewDeleg
     }
     
     
-    // MARK: lazy load {
+    // MARK: - lazy load
     lazy var datePickerView: PJDatePickerView = {
         let datePickerView = PJDatePickerView.newInstance()
         datePickerView?.height = 250
