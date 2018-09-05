@@ -7,12 +7,14 @@ PODS:
   - AMapSearch (6.1.1):
     - AMapFoundation (~> 1.4)
   - IQKeyboardManagerSwift (6.1.1)
+  - Schedule (0.1.0)
 
 DEPENDENCIES:
   - AMap3DMap
   - AMapLocation
   - AMapSearch
   - IQKeyboardManagerSwift
+  - Schedule
 
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
@@ -21,6 +23,7 @@ SPEC REPOS:
     - AMapLocation
     - AMapSearch
     - IQKeyboardManagerSwift
+    - Schedule
 
 SPEC CHECKSUMS:
   AMap3DMap: ebfb4e202c2bee9c3a6c296264e29f12436b6379
@@ -28,7 +31,8 @@ SPEC CHECKSUMS:
   AMapLocation: cf024b53dc03663efb4ea4bcce27d4cce58bb97a
   AMapSearch: 3dcbf85c403a2a0fe0eda5318caabc272b31f5e1
   IQKeyboardManagerSwift: 977affaeb4d6e971975c7790a6850f31d38f1207
+  Schedule: 62cd2defb026a3607349b2a2b1bd8ec3fd12cccd
 
-PODFILE CHECKSUM: 42e422b93ab7b425d3310d1f4c1b4d08e8e5d24e
+PODFILE CHECKSUM: 9d2ccef08c058577579e43cdefb2bb103f76061f
 
 COCOAPODS: 1.5.3

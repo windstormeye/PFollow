@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		0C066ADD213E2906009B3BD1 /* PJDatePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C066ADC213E2906009B3BD1 /* PJDatePickerView.swift */; };
 		0C066ADF213E2911009B3BD1 /* PJDatePickerView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0C066ADE213E2911009B3BD1 /* PJDatePickerView.xib */; };
+		0C066B07213F8905009B3BD1 /* PJPlacesAnnotationScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C066B06213F8905009B3BD1 /* PJPlacesAnnotationScene.swift */; };
 		0C13EB3A213412F600FB2857 /* PJBaseViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C13EB39213412F600FB2857 /* PJBaseViewController.swift */; };
 		62A516DDBB5C6106632BC865 /* libPods-PFollow.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E8886EABC65D6A99C5B97FE5 /* libPods-PFollow.a */; };
 		74888186212314FF00B8814D /* PJHomeMapCalloutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74888185212314FF00B8814D /* PJHomeMapCalloutView.swift */; };
@@ -54,6 +55,7 @@
 /* Begin PBXFileReference section */
 		0C066ADC213E2906009B3BD1 /* PJDatePickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PJDatePickerView.swift; sourceTree = "<group>"; };
 		0C066ADE213E2911009B3BD1 /* PJDatePickerView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PJDatePickerView.xib; sourceTree = "<group>"; };
+		0C066B06213F8905009B3BD1 /* PJPlacesAnnotationScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PJPlacesAnnotationScene.swift; sourceTree = "<group>"; };
 		0C13EB39213412F600FB2857 /* PJBaseViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PJBaseViewController.swift; sourceTree = "<group>"; };
 		0C13EB3D213569CE00FB2857 /* PFollow.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PFollow.entitlements; sourceTree = "<group>"; };
 		2FAB104A06AD7BB86EFBA6F4 /* Pods-PFollow.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PFollow.release.xcconfig"; path = "Pods/Target Support Files/Pods-PFollow/Pods-PFollow.release.xcconfig"; sourceTree = "<group>"; };
@@ -133,6 +135,14 @@
 			path = Controller;
 			sourceTree = "<group>";
 		};
+		0C066B08213F8A79009B3BD1 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				0C066B06213F8905009B3BD1 /* PJPlacesAnnotationScene.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
 		0C13EB3B21341CB900FB2857 /* Flow */ = {
 			isa = PBXGroup;
 			children = (
@@ -176,12 +186,12 @@
 			path = controller;
 			sourceTree = "<group>";
 		};
-		74BB7A9321296AD500E02562 /* controller */ = {
+		74BB7A9321296AD500E02562 /* Controller */ = {
 			isa = PBXGroup;
 			children = (
 				74E67E5D21201F4C007C68F7 /* PJPlacesViewController.swift */,
 			);
-			path = controller;
+			path = Controller;
 			sourceTree = "<group>";
 		};
 		74BB7A9421296AEC00E02562 /* controller */ = {
@@ -319,7 +329,8 @@
 		74E67E5C21201F2E007C68F7 /* Places */ = {
 			isa = PBXGroup;
 			children = (
-				74BB7A9321296AD500E02562 /* controller */,
+				74BB7A9321296AD500E02562 /* Controller */,
+				0C066B08213F8A79009B3BD1 /* View */,
 			);
 			path = Places;
 			sourceTree = "<group>";
@@ -528,6 +539,7 @@
 				74E67E1C2120009A007C68F7 /* PFollow.xcdatamodeld in Sources */,
 				74E67E562120083B007C68F7 /* PJHomeMapView.swift in Sources */,
 				74E67E4A21200539007C68F7 /* PJDefine.swift in Sources */,
+				0C066B07213F8905009B3BD1 /* PJPlacesAnnotationScene.swift in Sources */,
 				748881882125B6D800B8814D /* PJHomeMapAnnotetionView.swift in Sources */,
 				74D0713521285652007A04A7 /* AnnotationModel.swift in Sources */,
 				0C066ADD213E2906009B3BD1 /* PJDatePickerView.swift in Sources */,
