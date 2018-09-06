@@ -138,7 +138,7 @@
 		0C066B08213F8A79009B3BD1 /* View */ = {
 			isa = PBXGroup;
 			children = (
-				0C066B06213F8905009B3BD1 /* PJPlacesAnnotationScene.swift */,
+				0C6DB3F4214101D400BD0D61 /* Scene */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -158,6 +158,14 @@
 				0C066ADA213E28C9009B3BD1 /* View */,
 			);
 			path = Details;
+			sourceTree = "<group>";
+		};
+		0C6DB3F4214101D400BD0D61 /* Scene */ = {
+			isa = PBXGroup;
+			children = (
+				0C066B06213F8905009B3BD1 /* PJPlacesAnnotationScene.swift */,
+			);
+			path = Scene;
 			sourceTree = "<group>";
 		};
 		3745F555965D8316E0827EBF /* Frameworks */ = {

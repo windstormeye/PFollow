@@ -15,10 +15,14 @@ import Schedule
 
 class PJPlacesAnnotationScene: SKScene {
 
-    let motionManager = CMMotionManager() // 加速度计管理器
+    var annotationViews: [AnnotationModel]? {
+        willSet(models) {
+            willSetAnnotationModels(models!)
+        }
+    }
     
+    private let motionManager = CMMotionManager() // 加速度计管理器
     private var bottleViwSprite: SKSpriteNode?
-    private var bottleViwSprites = [SKSpriteNode]()
     
 
     
@@ -27,7 +31,6 @@ class PJPlacesAnnotationScene: SKScene {
         super.init(size: size)
         
         initView()
-        initDate()
     }
     
     
@@ -45,11 +48,9 @@ class PJPlacesAnnotationScene: SKScene {
         bottleViwSprite?.position = CGPoint(x: self.size.width * 0.11,
                                             y: size.height - 10 - bottleViwSprite!.size.height)
         bottleViwSprite?.anchorPoint = CGPoint(x: 0, y: 0)
-        bottleViwSprite?.physicsBody = SKPhysicsBody(edgeLoopFrom: CGRect(x: bottleViwSprite!.frame.origin.x * 0.45,
-                                                                          y: bottleViwSprite!.size.height * 0.1,
-                                                                          width: bottleViwSprite!.size.width * 0.75,
-                                                                          height: bottleViwSprite!.size.height - bottleViwSprite!.size.height * 0.3))
-        self.addChild(bottleViwSprite!)
+        bottleViwSprite?.physicsBody = SKPhysicsBody(edgeLoopFrom: CGRect(x: bottleViwSprite!.frame.origin.x * 0.45, y: bottleViwSprite!.size.height * 0.1, width: bottleViwSprite!.size.width * 0.75, height: bottleViwSprite!.size.height - bottleViwSprite!.size.height * 0.3))
+        bottleViwSprite?.physicsBody?.density = 1000
+        addChild(bottleViwSprite!)
         
         
         let leftBox = SKSpriteNode(imageNamed: "places_null")
@@ -69,32 +70,8 @@ class PJPlacesAnnotationScene: SKScene {
         rightBox.physicsBody?.isDynamic = false
         bottleViwSprite?.addChild(rightBox)
         
-        for i in 0...400 {
-            Schedule.after(Double(0.05 * Double(i)).second).do {
-                DispatchQueue.main.async {
-                    let annotationSprite = SKSpriteNode(imageNamed: "home_map_makers_02")
-                    let randomX = self.bottleViwSprite!.size.width - self.bottleViwSprite!.frame.origin.x * 2 - 40
-                    let annotationX = CGFloat(arc4random_uniform(UInt32(randomX))) + self.bottleViwSprite!.frame.origin.x
-                    annotationSprite.position = CGPoint(x: annotationX, y: self.bottleViwSprite!.size.height * 0.75)
-                    annotationSprite.size = CGSize(width: 12, height: 12)
-                    annotationSprite.physicsBody = SKPhysicsBody(circleOfRadius: annotationSprite.size.height / 2)
-                    annotationSprite.physicsBody?.usesPreciseCollisionDetection = true
-                    let scale = arc4random_uniform(3)
-                    annotationSprite.scale(to: CGSize(width: CGFloat(scale) * 12, height: CGFloat(scale) * 12))
-                    self.bottleViwSprite?.addChild(annotationSprite)
-                    
-                    self.bottleViwSprites.append(annotationSprite)
-                }
-            }
-        }
         
         startMonitoringAcceleration()
-        
-    }
-    
-
-    private func initDate() {
-        
     }
     
     
@@ -102,15 +79,36 @@ class PJPlacesAnnotationScene: SKScene {
     func startMonitoringAcceleration(){
         if motionManager.isAccelerometerAvailable {
             // 感应时间
-            motionManager.accelerometerUpdateInterval = 0.2
+            motionManager.accelerometerUpdateInterval = 0
             motionManager.startAccelerometerUpdates(to: OperationQueue.current!) { (data, error) in
                 guard let accelerometerData = data else {
                     return
                 }
                 let acceleration = accelerometerData.acceleration
-                
-                self.physicsWorld.gravity = CGVector(dx: acceleration.x * 9.8,
-                                                     dy: acceleration.y * 9.8)
+                self.physicsWorld.gravity = CGVector(dx: acceleration.x * 4,
+                                                     dy: acceleration.y * 4)
+            }
+        }
+    }
+    
+    
+    private func willSetAnnotationModels(_ models: [AnnotationModel]) {
+        for i in 0 ..< models.count {
+            Schedule.after(Double(0.05 * Double(i)).second).do {
+                DispatchQueue.main.async {
+                    let annotationSprite = SKSpriteNode(imageNamed: "home_map_makers_02")
+                    let randomX = self.bottleViwSprite!.size.width - self.bottleViwSprite!.frame.origin.x * 2 - 40
+                    let annotationX = CGFloat(arc4random_uniform(UInt32(randomX))) + self.bottleViwSprite!.frame.origin.x
+                    annotationSprite.position = CGPoint(x: annotationX, y: self.bottleViwSprite!.size.height * 0.8)
+                    annotationSprite.size = CGSize(width: 12, height: 12)
+                    annotationSprite.physicsBody = SKPhysicsBody(circleOfRadius: annotationSprite.size.height / 3)
+                    annotationSprite.physicsBody?.usesPreciseCollisionDetection = true
+                    annotationSprite.scale(to: CGSize(width: 12, height: 12))
+                    // 置于最底层
+                    annotationSprite.zPosition = -1
+                    
+                    self.bottleViwSprite?.addChild(annotationSprite)
+                }
             }
         }
     }

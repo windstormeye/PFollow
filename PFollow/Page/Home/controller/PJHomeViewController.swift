@@ -12,6 +12,7 @@ class PJHomeViewController: PJBaseViewController, PJHomeBottomViewDelegate, PJMa
 
     var mapView: PJHomeMapView?
     var bottomView: PJHomeBottomView?
+    var realAnnotations = [AnnotationModel]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -71,7 +72,9 @@ class PJHomeViewController: PJBaseViewController, PJHomeBottomViewDelegate, PJMa
             self.bottomView?.tapBtn.alpha = 0
         }) { (finished) in
             if finished {
-                self.present(PJPlacesViewController(), animated: true, completion: nil)
+                let vc = PJPlacesViewController()
+                vc.annotationModels = self.realAnnotations
+                self.present(vc, animated: true, completion: nil)
             }
         }
     }
@@ -151,6 +154,10 @@ class PJHomeViewController: PJBaseViewController, PJHomeBottomViewDelegate, PJMa
                 let pointAnnotation = MAPointAnnotation()
                 pointAnnotation.coordinate = CLLocationCoordinate2D.init(latitude: Double(annotation.latitude)!, longitude: Double(annotation.longitude)!)
                 mapView.mapView.addAnnotation(pointAnnotation)
+                
+                if annotation.createdTimeString.contains("/") {
+                    realAnnotations.append(annotation)
+                }
                 
                 index += 1
             }
