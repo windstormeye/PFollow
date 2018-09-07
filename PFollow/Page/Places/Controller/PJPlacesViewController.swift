@@ -9,7 +9,7 @@
 import UIKit
 import SpriteKit
 
-class PJPlacesViewController: UIViewController {
+class PJPlacesViewController: PJBaseViewController {
 
     
     var annotationModels: [AnnotationModel]?
@@ -17,6 +17,8 @@ class PJPlacesViewController: UIViewController {
     private var topView: UIImageView?
     private var animator: UIDynamicAnimator?
     private var titleLabel: UILabel?
+    private var skView: SKView?
+    private var currentModel: AnnotationModel?
     
     
     // MARK: - life cycle
@@ -45,19 +47,28 @@ class PJPlacesViewController: UIViewController {
   
     
     private func initScene() {
-        let scnView = SKView(frame: CGRect(x: 0, y: topView!.bottom,
+        skView = SKView(frame: CGRect(x: 0, y: topView!.bottom,
                                            width: view.width, height: view.height - topView!.bottom))
-        view.addSubview(scnView)
+        view.addSubview(skView!)
         
-        let scene = PJPlacesAnnotationScene(size: scnView.frame.size)
+        let scene = PJPlacesAnnotationScene(size: skView!.frame.size)
         scene.scaleMode = .aspectFill
         scene.annotationViews = annotationModels
-        scnView.presentScene(scene)
+        skView?.presentScene(scene)
 //        scnView.showsPhysics = true
-        scnView.ignoresSiblingOrder = true
+        skView?.ignoresSiblingOrder = true
         
-        scnView.showsFPS = true
-        scnView.showsNodeCount = true
+        skView?.showsFPS = true
+        skView?.showsNodeCount = true
+        
+        
+        let skViewButton = UIButton(frame: CGRect(x: skView!.x, y: skView!.y,
+                                                  width: skView!.width,
+                                                  height: skView!.height))
+        skViewButton.addTarget(self,
+                               action: #selector(bottleViewTapped),
+                               for: .touchUpInside)
+        view.addSubview(skViewButton)
     }
     
     
@@ -75,15 +86,12 @@ class PJPlacesViewController: UIViewController {
         topView?.image = UIImage(named: "home_cloud")
      
         
-        let tapped = UITapGestureRecognizer(target: self, action: #selector(bottleViewTapped))
-        
-        
-        
         titleLabel = UILabel(frame: CGRect(x: 0, y: 0,
                                            width: view.width, height: 100))
         view.addSubview(titleLabel!)
         titleLabel?.numberOfLines = 2
         titleLabel?.textAlignment = .center
+        titleLabel?.text = ""
         titleLabel?.font = UIFont.systemFont(ofSize: 22,
                                              weight: .light)
     }
@@ -97,15 +105,21 @@ class PJPlacesViewController: UIViewController {
     
     
     @objc private func bottleViewTapped() {
-        
+        if titleLabel?.text != "" {
+            let annotationView = PJHomeMapAnnotationView(annotation: nil, reuseIdentifier: nil)
+            annotationView?.model = currentModel
+            let vc = PJAnnotationDetailsViewController()
+            vc.annotationView = annotationView
+            navigationController?.pushViewController(vc, animated: true)
+        }
     }
 
     
     // MARK: - delegate
     override func motionEnded(_ motion: UIEventSubtype, with event: UIEvent?) {
         if event?.subtype == UIEventSubtype.motionShake {
-            let model = annotationModels![Int(arc4random_uniform(UInt32(annotationModels!.count)))]
-            titleLabel?.text = model.formatterAddress
+            currentModel = annotationModels![Int(arc4random_uniform(UInt32(annotationModels!.count)))]
+            titleLabel?.text = currentModel?.formatterAddress
             PJTapic.succee()
         }
     }

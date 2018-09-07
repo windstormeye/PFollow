@@ -74,7 +74,8 @@ class PJHomeViewController: PJBaseViewController, PJHomeBottomViewDelegate, PJMa
             if finished {
                 let vc = PJPlacesViewController()
                 vc.annotationModels = self.realAnnotations
-                self.present(vc, animated: true, completion: nil)
+                let nav = UINavigationController(rootViewController: vc)
+                self.present(nav, animated: true, completion: nil)
             }
         }
     }
