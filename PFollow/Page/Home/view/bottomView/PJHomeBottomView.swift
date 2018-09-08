@@ -55,8 +55,8 @@ class PJHomeBottomView: UIView {
     }
     
     
-    private func initView() {
-        let backView = UIImageView(frame: CGRect(x: 0, y: 0, width: width, height: height))
+    private func initView() {        
+        let backView = UIImageView(frame: CGRect(x: 0, y: 0, width: width, height: 160))
         addSubview(backView)
         backView.isUserInteractionEnabled = true
         backView.image = UIImage(named: "home_cloud")
@@ -68,7 +68,7 @@ class PJHomeBottomView: UIView {
         tapBtn.height = 70
         // 0.1 为 cloud 的放大偏移量
         tapBtn.centerX = self.centerX + PJSCREEN_WIDTH * 0.1
-        tapBtn.y = 40
+        tapBtn.y = (height - 70) / 2
         tapBtn.layer.shadowColor = UIColor.black.cgColor
         tapBtn.layer.shadowRadius = 5
         tapBtn.layer.shadowOpacity = 0.3

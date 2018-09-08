@@ -53,13 +53,13 @@ class PJPlacesViewController: PJBaseViewController {
         
         let scene = PJPlacesAnnotationScene(size: skView!.frame.size)
         scene.scaleMode = .aspectFill
-        scene.annotationViews = annotationModels
+        scene.annotationModels = annotationModels
         skView?.presentScene(scene)
-//        scnView.showsPhysics = true
-        skView?.ignoresSiblingOrder = true
         
-        skView?.showsFPS = true
-        skView?.showsNodeCount = true
+        skView?.ignoresSiblingOrder = true
+//        scnView.showsPhysics = true
+//        skView?.showsFPS = true
+//        skView?.showsNodeCount = true
         
         
         let skViewButton = UIButton(frame: CGRect(x: skView!.x, y: skView!.y,
@@ -74,8 +74,10 @@ class PJPlacesViewController: PJBaseViewController {
     
     private func initView() {
         view.backgroundColor = PJRGB(r: 11, g: 11, b: 11)
+        headerView?.backgroundColor = .white
+        UIApplication.shared.statusBarStyle = .default
         
-        topView = UIImageView(frame: CGRect(x: -PJSCREEN_WIDTH * 0.1, y: -60,
+        topView = UIImageView(frame: CGRect(x: -PJSCREEN_WIDTH * 0.1, y: -80 + PJStatusHeight,
                                             width: PJSCREEN_WIDTH * 1.2, height: 160))
         let tap = UITapGestureRecognizer(target: self,
                                          action: #selector(backViewTapGestureClick))
@@ -86,8 +88,11 @@ class PJPlacesViewController: PJBaseViewController {
         topView?.image = UIImage(named: "home_cloud")
      
         
-        titleLabel = UILabel(frame: CGRect(x: 0, y: 0,
+        titleLabel = UILabel(frame: CGRect(x: 0, y: -PJStatusHeight,
                                            width: view.width, height: 100))
+        if iPhoneX {
+            titleLabel?.y = 10
+        }
         view.addSubview(titleLabel!)
         titleLabel?.numberOfLines = 2
         titleLabel?.textAlignment = .center
@@ -106,10 +111,12 @@ class PJPlacesViewController: PJBaseViewController {
     
     @objc private func bottleViewTapped() {
         if titleLabel?.text != "" {
-            let annotationView = PJHomeMapAnnotationView(annotation: nil, reuseIdentifier: nil)
+            let annotationView = PJHomeMapAnnotationView(annotation: nil,
+                                                         reuseIdentifier: nil)
             annotationView?.model = currentModel
             let vc = PJAnnotationDetailsViewController()
             vc.annotationView = annotationView
+            vc.isHiddenRightBarButton = true
             navigationController?.pushViewController(vc, animated: true)
         }
     }
@@ -118,10 +125,18 @@ class PJPlacesViewController: PJBaseViewController {
     // MARK: - delegate
     override func motionEnded(_ motion: UIEventSubtype, with event: UIEvent?) {
         if event?.subtype == UIEventSubtype.motionShake {
+            guard annotationModels?.count != 0 else {
+                return
+            }
             currentModel = annotationModels![Int(arc4random_uniform(UInt32(annotationModels!.count)))]
             titleLabel?.text = currentModel?.formatterAddress
             PJTapic.succee()
         }
+    }
+    
+    
+    override var prefersStatusBarHidden: Bool {
+        return true
     }
     
 }

@@ -15,7 +15,7 @@ import Schedule
 
 class PJPlacesAnnotationScene: SKScene {
 
-    var annotationViews: [AnnotationModel]? {
+    var annotationModels: [AnnotationModel]? {
         willSet(models) {
             willSetAnnotationModels(models!)
         }
@@ -46,7 +46,7 @@ class PJPlacesAnnotationScene: SKScene {
         bottleViwSprite = SKSpriteNode(imageNamed: "places_bgView")
         bottleViwSprite?.size = CGSize(width: self.size.width * 0.9, height: self.size.width / 0.656)
         bottleViwSprite?.position = CGPoint(x: self.size.width * 0.11,
-                                            y: size.height - 10 - bottleViwSprite!.size.height)
+                                            y: (size.height - bottleViwSprite!.size.height) / 2)
         bottleViwSprite?.anchorPoint = CGPoint(x: 0, y: 0)
         bottleViwSprite?.physicsBody = SKPhysicsBody(edgeLoopFrom: CGRect(x: bottleViwSprite!.frame.origin.x * 0.45, y: bottleViwSprite!.size.height * 0.1, width: bottleViwSprite!.size.width * 0.75, height: bottleViwSprite!.size.height - bottleViwSprite!.size.height * 0.3))
         bottleViwSprite?.physicsBody?.density = 1000
@@ -85,8 +85,8 @@ class PJPlacesAnnotationScene: SKScene {
                     return
                 }
                 let acceleration = accelerometerData.acceleration
-                self.physicsWorld.gravity = CGVector(dx: acceleration.x * 4,
-                                                     dy: acceleration.y * 4)
+                self.physicsWorld.gravity = CGVector(dx: acceleration.x * 9.8,
+                                                     dy: acceleration.y * 9.8)
             }
         }
     }
@@ -100,10 +100,8 @@ class PJPlacesAnnotationScene: SKScene {
                     let randomX = self.bottleViwSprite!.size.width - self.bottleViwSprite!.frame.origin.x * 2 - 40
                     let annotationX = CGFloat(arc4random_uniform(UInt32(randomX))) + self.bottleViwSprite!.frame.origin.x
                     annotationSprite.position = CGPoint(x: annotationX, y: self.bottleViwSprite!.size.height * 0.8)
-                    annotationSprite.size = CGSize(width: 12, height: 12)
+                    annotationSprite.size = CGSize(width: 18, height: 18)
                     annotationSprite.physicsBody = SKPhysicsBody(circleOfRadius: annotationSprite.size.height / 3)
-                    annotationSprite.physicsBody?.usesPreciseCollisionDetection = true
-                    annotationSprite.scale(to: CGSize(width: 12, height: 12))
                     // 置于最底层
                     annotationSprite.zPosition = -1
                     

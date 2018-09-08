@@ -11,9 +11,12 @@ import UIKit
 class PJBaseViewController: UIViewController {
     
     var headerView: UIView?
-    
     var navBarHeigt: CGFloat?
+    var rightBarButton: UIButton?
+    var leftBarButton: UIButton?
     
+    
+    // MARK: - life cycle
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -60,6 +63,7 @@ class PJBaseViewController: UIViewController {
         rightButton.setImage(UIImage(named: imageName), for: .normal)
         rightButton.addTarget(self, action: action, for: .touchUpInside)
         let rightBarButtonItem = UIBarButtonItem(customView: rightButton)
+        rightBarButton = rightButton
         navigationItem.rightBarButtonItem = rightBarButtonItem
     }
 }

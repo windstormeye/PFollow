@@ -16,6 +16,10 @@ let PJSCREEN_WIDTH = CGFloat(UIScreen.main.bounds.width)
 let PJTABBAR_HEIGHT = CGFloat(48)
 let PJStatusHeight = UIApplication.shared.statusBarFrame.size.height
 
+// 不能直接这么写死 34
+let PJBottomLinerHeight = iPhoneX ? CGFloat(34) : 0
+let iPhoneX = PJSCREEN_HEIGHT == 812
+
 func PJDeviceWithPortrait() -> Bool {
     return UIDevice.current.orientation == .portrait || UIDevice.current.orientation == .portraitUpsideDown
 }

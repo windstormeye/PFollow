@@ -36,16 +36,18 @@ class PJHomeViewController: PJBaseViewController, PJHomeBottomViewDelegate, PJMa
     
     // MARK: life cycle
     private func initView() {
+        view.backgroundColor = .white
+        
         mapView = PJHomeMapView.init(frame: CGRect(x: 0, y: 0,
                                                    width: PJSCREEN_WIDTH,
-                                                   height: PJSCREEN_HEIGHT))
+                                                   height: PJSCREEN_HEIGHT - PJBottomLinerHeight))
         mapView?.viewDelegate = self
         view.addSubview(mapView!)
         
         bottomView = PJHomeBottomView.init(frame: CGRect(x: -PJSCREEN_WIDTH * 0.1,
-                                                         y: PJSCREEN_HEIGHT - 120,
+                                                         y: PJSCREEN_HEIGHT - 120 - PJBottomLinerHeight,
                                                          width: PJSCREEN_WIDTH * 1.2,
-                                                         height: 160))
+                                                         height: 160 - PJBottomLinerHeight))
         bottomView?.viewDelegate = self
         view.addSubview(bottomView!)
         
@@ -123,6 +125,7 @@ class PJHomeViewController: PJBaseViewController, PJHomeBottomViewDelegate, PJMa
     func mapViewTappedCalloutView(_ mapView: PJHomeMapView, annotationView: PJHomeMapAnnotationView) {
         let vc = PJAnnotationDetailsViewController()
         vc.annotationView = annotationView
+        vc.isHiddenRightBarButton = false
         navigationController?.pushViewController(vc, animated: true)
     }
     

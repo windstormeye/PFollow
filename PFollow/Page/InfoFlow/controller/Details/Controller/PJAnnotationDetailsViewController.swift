@@ -11,6 +11,7 @@ import UIKit
 class PJAnnotationDetailsViewController: PJBaseViewController, UIScrollViewDelegate, UITextViewDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate, PJDatePickerViewDelegate {
 
     var annotationView: PJHomeMapAnnotationView?
+    var isHiddenRightBarButton: Bool?
     
     private var environmentLabel: UILabel?
     private var healthLabel: UILabel?
@@ -31,11 +32,13 @@ class PJAnnotationDetailsViewController: PJBaseViewController, UIScrollViewDeleg
     private var previousContentText: String?
     private var updateTimeString: String?
     
+    
+    
+    // MARK: - life cycle
     override func viewDidLoad() {
         super.viewDidLoad()
         
         leftBarButtonItemAction(action: #selector(leftBarButtonTapped))
-        rightBarButtonItem(imageName: "annotation_details_save", action: #selector(rightButtonTapped))
         view.backgroundColor = PJRGB(r: 31, g: 31, b: 31)
         
         initView()
@@ -47,9 +50,7 @@ class PJAnnotationDetailsViewController: PJBaseViewController, UIScrollViewDeleg
     }
     
     
-    // MARK: -life cycle
     fileprivate func initView() {
-        
         backScrollView = UIScrollView(frame: CGRect(x: 0, y: headerView!.bottom,
                                                         width: view.width, height: view.height))
         backScrollView?.delegate = self
@@ -161,16 +162,27 @@ class PJAnnotationDetailsViewController: PJBaseViewController, UIScrollViewDeleg
         if let photoImage = PJCoreDataHelper.shared.annotationImage(model: annotationView!.model!) {
             clipNewPhotoImage(photoImage)
             newPhotoImage = photoImage
+        } else {
+            if isHiddenRightBarButton! {
+                photoContentView?.removeFromSuperview()
+            }
         }
         
-        // MARK: coreData
+        // MARK: - coreData
         let content = PJCoreDataHelper.shared.annotationContent(model: annotationView!.model!)
         if content == "" {
-            contentTextViewTipsLabel?.isHidden = false
-            contentTextViewTipsLabel?.text = "快来填写签到内容吧～"
+            if isHiddenRightBarButton! {
+                contentTextView?.isHidden = true
+            } else {
+                contentTextViewTipsLabel?.isHidden = false
+                contentTextViewTipsLabel?.text = "快来填写签到内容吧～"
+            }
             
             updateBackScrollViewContentSize()
         } else {
+            if isHiddenRightBarButton! {
+                contentTextView?.isEditable = false
+            }
             contentTextViewTipsLabel?.isHidden = true
             contentTextView?.text = content
             previousContentText = content
