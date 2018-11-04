@@ -1,5 +1,6 @@
-# PFollow
 <img src="./banner.png" width = "100%" height = "100%" align=center />
+# PFollow
+![IMG_0305.jpg](https://i.loli.net/2018/11/03/5bddc2dc527a3.jpg)
 
 ## 简介
 PFollow 为今年暑假新开的项目，期末考试完后和女票一同去了重庆青海西安十日游。在游玩的过程中，使用众多 app 协助旅行，在青海时，会经常到查看 iOS 自带的“指南针” app 看当前海拔。同时也因为在高原的天气变化多端，会非常注意第二天的天气等等这些习惯就被强制性的养成了。
@@ -56,8 +57,6 @@ PFollow 为今年暑假新开的项目，期末考试完后和女票一同去了
 不过好在到现在已经对 “Core Data” 有了一定的了解，并且也把习得的知识用在了实习公司的产品中，替换了大部分数据缓存策略。
 
 ## 展示
-![IMG_0305.jpg](https://i.loli.net/2018/11/03/5bddc2dc527a3.jpg)
-
 ### 地图
 <img src="https://i.loli.net/2018/11/03/5bddc386d5b5b.jpeg" width = "60%" height = "100%" align=center />
 
